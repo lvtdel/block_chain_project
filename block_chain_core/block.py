@@ -1,11 +1,13 @@
 import json
 import hashlib
 
+from block_chain_core.transation import Transaction
+
 
 class Block:
     def __init__(self, index, transactions, timestamp, previous_hash, nonce=0):
         self.index = index
-        self.transactions = transactions  # list of dict
+        self.transactions: list[Transaction] = transactions
         self.timestamp = timestamp
         self.previous_hash = previous_hash
         self.nonce = nonce
@@ -16,8 +18,7 @@ class Block:
         def hash_pair(a, b):
             return hashlib.sha256((a + b).encode()).hexdigest()
 
-        tx_hashes = [hashlib.sha256(json.dumps(tx, sort_keys=True).encode()).hexdigest()
-                     for tx in self.transactions]
+        tx_hashes = [tx.compute_hash() for tx in self.transactions]
 
         while len(tx_hashes) > 1:
             if len(tx_hashes) % 2 == 1:  # make even
@@ -30,7 +31,7 @@ class Block:
     def compute_hash(self):
         block_string = json.dumps({
             "index": self.index,
-            "transactions": self.transactions,
+            # "transactions": self.transactions,
             "timestamp": self.timestamp,
             "previous_hash": self.previous_hash,
             "nonce": self.nonce,
@@ -47,3 +48,13 @@ class Block:
             f"merkle_root: {self.merkle_root}\n"
             f"previous_hash: {self.previous_hash}\n"
             f"hash: {self.hash}")
+
+    def to_dict(self):
+        return {
+            'index': self.index,
+            'timestamp': self.timestamp,
+            'transactions': [tx.__dict__ for tx in self.transactions],
+            'previous_hash': self.previous_hash,
+            'hash': self.hash,
+            'nonce': self.nonce
+        }

@@ -4,8 +4,11 @@ from concurrent.futures import ThreadPoolExecutor
 import time
 from multiprocessing import cpu_count
 
-from block import Block
-from block_chain import Blockchain, mine_block_multiprocessing
+from block_chain_core.block import Block
+from block_chain_core.block_chain import Blockchain
+from block_chain_core.mine import mine_block_multiprocessing
+from block_chain_core.transation import Transaction
+
 
 # executor = ThreadPoolExecutor()
 
@@ -13,8 +16,8 @@ class Miner:
     def __init__(self, blockchain: Blockchain, miner_id: str = "fff"):
         self.blockchain = blockchain
         self.miner_id = miner_id
-        self.mempool = []
-        self.mem_temp = []
+        self.mempool: list[Transaction] = []
+        self.mem_temp: list[Transaction] = []
         self.__is_mining = False
         self.mining_thread = None
         self.start_repeat_mining()
@@ -46,9 +49,11 @@ class Miner:
         self.__is_mining = True
         self.mem_temp = self.mempool[:5]
 
-        self.mining_thread = threading.Thread(target=self.mine_process)
-        self.mining_thread.daemon = False
-        self.mining_thread.start()
+        threading.Thread(target=self.mine_process, daemon=False).start()
+
+        # self.mining_thread = threading.Thread(target=self.mine_process)
+        # self.mining_thread.daemon = False
+        # self.mining_thread.start()
 
     def mine_process(self):
         try:
@@ -64,6 +69,7 @@ class Miner:
             nonce = mine_block_multiprocessing(new_block, 
                                             difficulty=self.blockchain.difficulty, 
                                             processes=cpu_count())
+            print("End mining.")
             
             if nonce == -1:
                 print("No valid nonce found.")

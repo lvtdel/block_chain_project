@@ -1,13 +1,14 @@
 import asyncio
+import json
 from multiprocessing import Process, Value
 import time
 
 from pyee import EventEmitter
 
-from block import Block
-from block_chain import Blockchain
-from mine import mine_worker
-from miner import Miner
+from block_chain_core.block import Block
+from block_chain_core.block_chain import Blockchain
+from block_chain_core.miner import Miner
+from block_chain_core.transation import Transaction
 
 
 # Tạo hàm main() bất đồng bộ
@@ -16,8 +17,12 @@ async def main():
     bc = Blockchain(difficulty=4, ee=ee)
     miner = Miner(bc)
 
-    miner.add_transaction({"from": "Alice", "to": "Bob", "amount": 10})
-    miner.add_transaction({"from": "Bob", "to": "Charlie", "amount": 5})
+    tx1 = Transaction("payment", "Bob", "Alice", "Bob")
+    tx2 = Transaction("payment", "Bob", "Alice", "Bob")
+    miner.add_transaction(tx1)
+    miner.add_transaction(tx2)
+
+    # print(json.dumps({"from": "Alice", "to": "Bob", "amount": 10}, sort_keys=True).encode())
 
     # Đợi cho quá trình đào hoàn tất
     # await bc.mine_pending_transactions()

@@ -3,10 +3,9 @@ from multiprocessing import cpu_count
 from pyee import EventEmitter
 from pyee.asyncio import AsyncIOEventEmitter
 
-from block import Block
 import time
 
-from mine import mine_block_multiprocessing
+from block_chain_core.block import Block
 
 
 class Blockchain:
@@ -29,6 +28,7 @@ class Blockchain:
             print("Invalid block, block discarded.")
 
         self.chain.append(block)
+        print(f"Block #{block.transactions[0]} added to the chain.")
         self.__ee.emit('add_new_block', block)
 
     def is_new_block_valid(self, block: Block):
