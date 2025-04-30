@@ -15,13 +15,13 @@ def mine_worker(start_nonce, step, block: Block, difficulty: int, result_nonce: 
     prefix = '0' * difficulty
     nonce = start_nonce
 
-    while not found_flag.value:
+    while (not found_flag.value) or (nonce < start_nonce + 10000):
         block.nonce = nonce
         current_hash = block.compute_hash()
         if current_hash.startswith(prefix):
             with result_nonce.get_lock(), found_flag.get_lock():
                 if not found_flag.value:
-                    print(f"Found result nonce: {nonce}")
+                    # print(f"Found result nonce: {nonce}")
                     result_nonce.value = nonce
                     found_flag.value = 1
             return

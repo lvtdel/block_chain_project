@@ -1,3 +1,5 @@
+import time
+
 from flask import Flask, request, jsonify
 from pyee import EventEmitter
 from waitress import serve
@@ -11,18 +13,19 @@ app = Flask(__name__)
 
 # Khởi tạo blockchain và miner
 ee = EventEmitter()
-blockchain = Blockchain(difficulty=4, ee=ee)
+blockchain = Blockchain(difficulty=3, ee=ee)
 miner = Miner(blockchain)
 
 
 @ee.on('add_new_block')
 def print_new_block(block: Block):
-    for block in blockchain.chain:
-        print(f"\nBlock {block.index}")
-        print(f"Hash: {block.hash}")
-        print(f"Prev: {block.previous_hash}")
-        print(f"Transactions: {block.transactions}")
-    print(blockchain.is_chain_valid())
+    # for block in blockchain.chain:
+    #     print(f"\nBlock {block.index}")
+    #     print(f"Hash: {block.hash}")
+    #     print(f"Prev: {block.previous_hash}")
+    #     print(f"Transactions: {block.transactions}")
+    print(f"New block added: {block.hash}, \nTransactions: {block.transactions}")
+    print(f"Chain valid: {blockchain.is_chain_valid()}")
 
 
 @app.route('/transactions/new', methods=['POST'])

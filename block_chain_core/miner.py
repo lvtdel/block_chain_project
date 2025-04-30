@@ -10,8 +10,6 @@ from block_chain_core.mine import mine_block_multiprocessing
 from block_chain_core.transation import Transaction
 
 
-# executor = ThreadPoolExecutor()
-
 class Miner:
     def __init__(self, blockchain: Blockchain, miner_id: str = "fff"):
         self.blockchain = blockchain
@@ -20,15 +18,17 @@ class Miner:
         self.mem_temp: list[Transaction] = []
         self.__is_mining = False
         self.mining_thread = None
-        self.start_repeat_mining()
 
-    def start_repeat_mining(self):
-        def schedule_next():
-            self.repeat_mine()
-            # Lập lịch cho lần chạy tiếp theo
-            threading.Timer(4, schedule_next).start()
+        self.start_repeat_mine()
 
-        schedule_next()
+    def start_repeat_mine(self):
+        def run_async_in_thread():
+            while True:
+                # print("Repeat mine")
+                self.repeat_mine()
+                time.sleep(4)
+
+        threading.Thread(target=run_async_in_thread, daemon=False).start()
 
     def repeat_mine(self):
         if len(self.mempool) == 0 or self.__is_mining:
@@ -44,12 +44,15 @@ class Miner:
 
     def start_mining(self):
         if self.__is_mining:
+            # print("Already mining...")
             return
 
         self.__is_mining = True
         self.mem_temp = self.mempool[:5]
 
+        # print("Start mining...")
         threading.Thread(target=self.mine_process, daemon=False).start()
+        # self.executor.submit(self.mine_process)
 
         # self.mining_thread = threading.Thread(target=self.mine_process)
         # self.mining_thread.daemon = False
@@ -66,18 +69,18 @@ class Miner:
 
             print("Mining block...")
 
-            nonce = mine_block_multiprocessing(new_block, 
-                                            difficulty=self.blockchain.difficulty, 
-                                            processes=cpu_count())
-            print("End mining.")
-            
+            nonce = mine_block_multiprocessing(new_block,
+                                               difficulty=self.blockchain.difficulty,
+                                               processes=cpu_count())
+            # print("End mining.")
+
             if nonce == -1:
                 print("No valid nonce found.")
             else:
                 new_block.nonce = nonce
                 new_block.hash = new_block.compute_hash()
-                print(f"Block mined: {new_block.hash}")
-                
+                # print(f"Block mined: {new_block.hash}")
+
                 self.blockchain.add_block(new_block)
                 for tx in self.mem_temp:
                     if tx in self.mempool:

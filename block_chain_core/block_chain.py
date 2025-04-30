@@ -28,7 +28,6 @@ class Blockchain:
             print("Invalid block, block discarded.")
 
         self.chain.append(block)
-        print(f"Block #{block.transactions[0]} added to the chain.")
         self.__ee.emit('add_new_block', block)
 
     def is_new_block_valid(self, block: Block):
