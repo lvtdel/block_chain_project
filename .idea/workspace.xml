@@ -4,19 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7742f2c3-9a3a-42fd-af0f-f8c301b7db5d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/block_chain_lite.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/block.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/block_chain.ipynb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/block_chain.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mine.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/miner.py" afterDir="false" />
+    <list default="true" id="7742f2c3-9a3a-42fd-af0f-f8c301b7db5d" name="Changes" comment="Done a base blockchain component">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,8 +94,17 @@
       <workItem from="1745930717702" duration="2204000" />
       <workItem from="1745932940955" duration="1125000" />
       <workItem from="1745980902880" duration="30000" />
-      <workItem from="1745980951506" duration="10882000" />
+      <workItem from="1745980951506" duration="12828000" />
     </task>
+    <task id="LOCAL-00001" summary="Done a base blockchain component">
+      <option name="closed" value="true" />
+      <created>1745993207698</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1745993207698</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -123,8 +121,13 @@
       </map>
     </option>
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Done base blockchain 1 node" />
+    <MESSAGE value="Done a base blockchain component" />
+    <option name="LAST_COMMIT_MESSAGE" value="Done a base blockchain component" />
+  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/block_chain_lite$main.coverage" NAME="main Coverage Results" MODIFIED="1745991857959" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/block_chain_lite$main.coverage" NAME="main Coverage Results" MODIFIED="1745993073896" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/block_chain_lite$mine.coverage" NAME="mine Coverage Results" MODIFIED="1745931740384" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
