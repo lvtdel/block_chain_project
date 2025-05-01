@@ -9,7 +9,7 @@ from block_chain_core.block import Block
 
 
 class Blockchain:
-    def __init__(self, difficulty=2, ee = EventEmitter):
+    def __init__(self, difficulty=2, ee=EventEmitter):
         self.chain: list[Block] = []
         self.difficulty = difficulty
         self.pending_transactions = []
@@ -31,10 +31,13 @@ class Blockchain:
         self.__ee.emit('add_new_block', block)
 
     def is_new_block_valid(self, block: Block):
+        if not block.is_valid(self.difficulty): return False
         if block.previous_hash != self.get_last_block().hash:
             return False
-        if not block.hash.startswith('0' * self.difficulty):
-            return False
+
+        for tx in block.transactions:
+            if not tx.verify(): return False
+
         return True
 
     def get_last_block(self):
@@ -49,7 +52,32 @@ class Blockchain:
                 return False
             if curr.previous_hash != prev.hash:
                 return False
-            if not curr.hash.startswith('0' * self.difficulty):
+            if not curr.is_valid(self.difficulty):
                 return False
+
+        return True
+
+    def find_transaction(self, tx_hash: str):
+        for block in self.chain:
+            for tx in block.transactions:
+                if tx.hash == tx_hash:
+                    block_dict = block.to_dict()
+                    block_dict.pop('transactions')
+                    return {"block": block_dict, "tx": tx.__dict__}
+
+        return False
+
+    def find_block(self, block_hash: str):
+        for block in self.chain:
+            if block.hash == block_hash:
+                return block
+
+        return False
+
+    def is_nonce_valid(self, sender: str, nonce: int) -> bool:
+        for block in self.chain:
+            for tx in block.transactions:
+                if tx.sender == sender and tx.nonce == nonce:
+                    return False
 
         return True

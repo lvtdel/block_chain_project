@@ -18,7 +18,7 @@ class Block:
         def hash_pair(a, b):
             return hashlib.sha256((a + b).encode()).hexdigest()
 
-        tx_hashes = [tx.compute_hash() for tx in self.transactions]
+        tx_hashes = [tx.compute_hash_msg().hex() for tx in self.transactions]
 
         while len(tx_hashes) > 1:
             if len(tx_hashes) % 2 == 1:  # make even

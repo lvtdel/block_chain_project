@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package blockchain;
+
+// Transaction message (tuỳ theo cấu trúc của bạn)
+message Transaction {
+  string sender = 1;
+  string receiver = 2;
+  float amount = 3;
+  string signature = 4;
+}
+
+// Block message
+message Block {
+  int32 index = 1;
+  string previous_hash = 2;
+  string timestamp = 3;
+  string hash = 4;
+  int32 nonce = 5;
+  string merkle_root = 6;
+  repeated Transaction transactions = 7;
+}
+
+// Chain response
+message ChainResponse {
+  repeated Block chain = 1;
+}
+
+// Empty request
+message Empty {}
+
+// Service
+service BlockchainService {
+  rpc GetFullChain (Empty) returns (ChainResponse);
+}

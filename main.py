@@ -2,6 +2,7 @@ import asyncio
 import json
 from multiprocessing import Process, Value
 import time
+from os import cpu_count
 
 from pyee import EventEmitter
 

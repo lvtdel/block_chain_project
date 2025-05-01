@@ -8,16 +8,19 @@ from block_chain_core.block import Block
 from block_chain_core.block_chain import Blockchain
 from block_chain_core.mine import mine_block_multiprocessing
 from block_chain_core.transation import Transaction
+from exception.transaction_nonce_validation_exceptions import TransactionVerificationFailedException, \
+    BlockchainNonceInvalidException, MempoolNonceInvalidException
 
 
 class Miner:
-    def __init__(self, blockchain: Blockchain, miner_id: str = "fff"):
+    def __init__(self, blockchain: Blockchain, max_transaction_per_block, miner_id: str = "fff"):
         self.blockchain = blockchain
         self.miner_id = miner_id
         self.mempool: list[Transaction] = []
         self.mem_temp: list[Transaction] = []
         self.__is_mining = False
         self.mining_thread = None
+        self.max_transaction_per_block = max_transaction_per_block
 
         self.start_repeat_mine()
 
@@ -39,8 +42,17 @@ class Miner:
         self.start_mining()
 
     def add_transaction(self, transaction):
+        if not transaction.verify():
+            raise TransactionVerificationFailedException()
+        if not self.blockchain.is_nonce_valid(transaction.sender, transaction.nonce):
+            raise BlockchainNonceInvalidException()
+        if not self.is_nonce_valid(transaction.sender, transaction.nonce):
+            raise MempoolNonceInvalidException()
+
         self.mempool.append(transaction)
         self.start_mining()
+
+        return True
 
     def start_mining(self):
         if self.__is_mining:
@@ -48,7 +60,7 @@ class Miner:
             return
 
         self.__is_mining = True
-        self.mem_temp = self.mempool[:5]
+        self.mem_temp = self.mempool[:self.max_transaction_per_block]
 
         # print("Start mining...")
         threading.Thread(target=self.mine_process, daemon=False).start()
@@ -89,3 +101,10 @@ class Miner:
 
         finally:
             self.__is_mining = False
+
+    def is_nonce_valid(self, sender: str, nonce: int) -> bool:
+        for tx in self.mempool:
+            if tx.sender == sender and tx.nonce == nonce:
+                return False
+
+        return True
