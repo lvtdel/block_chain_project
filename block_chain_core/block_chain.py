@@ -23,9 +23,10 @@ class Blockchain:
         genesis_block = Block(0, [], time.time(), "0")
         self.chain.append(genesis_block)
 
-    def add_block(self, block: Block):
-        if not self.is_new_block_valid(block):
-            print("Invalid block, block discarded.")
+    def add_block(self, block: Block, validate=True):
+        if validate:
+            if not self.is_new_block_valid(block):
+                print("Invalid block, block discarded.")
 
         self.chain.append(block)
         self.__ee.emit('add_new_block', block)

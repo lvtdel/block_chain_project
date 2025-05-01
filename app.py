@@ -1,4 +1,6 @@
+import threading
 import time
+from multiprocessing import Process
 
 from flask import Flask, request, jsonify
 from pyee import EventEmitter
@@ -11,6 +13,8 @@ from block_chain_core.transation import Transaction
 
 import os
 
+from block_chain_grpc.blockchain_service import serve_grpc
+
 DIFFICULTY = int(os.getenv('DIFFICULTY'))
 PORT = int(os.getenv('PORT'))
 MAX_TRANSACTIONS = int(os.getenv('MAX_TRANSACTIONS_PER_BLOCK'))
@@ -21,6 +25,8 @@ ee = EventEmitter()
 blockchain = Blockchain(difficulty=DIFFICULTY, ee=ee)
 miner = Miner(blockchain, MAX_TRANSACTIONS)
 
+th = threading.Thread(target=serve_grpc, args=(blockchain,))
+th.start()
 
 @ee.on('add_new_block')
 def print_new_block(block: Block):

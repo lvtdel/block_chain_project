@@ -14,6 +14,20 @@ class Block:
         self.merkle_root = self.compute_merkle_root()
         self.hash = self.compute_hash()
 
+    @staticmethod
+    def from_proto(proto_block):
+        transactions = [Transaction.from_proto(tx) for tx in proto_block.transactions]
+        new_block = Block(
+            index=proto_block.index,
+            previous_hash=proto_block.previous_hash,
+            timestamp=float(proto_block.timestamp),  # nếu cần
+            nonce=proto_block.nonce,
+            transactions=transactions
+        )
+        new_block.hash = proto_block.hash
+        new_block.merkle_root = proto_block.merkle_root
+        return new_block
+
     def compute_merkle_root(self):
         def hash_pair(a, b):
             return hashlib.sha256((a + b).encode()).hexdigest()
@@ -58,3 +72,5 @@ class Block:
             'hash': self.hash,
             'nonce': self.nonce
         }
+    def __repr__(self):
+        return self.__str__()

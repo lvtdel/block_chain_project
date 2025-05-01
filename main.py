@@ -16,10 +16,10 @@ from block_chain_core.transation import Transaction
 async def main():
     ee = EventEmitter()
     bc = Blockchain(difficulty=4, ee=ee)
-    miner = Miner(bc)
+    miner = Miner(bc, 3)
 
-    tx1 = Transaction("payment", "Bob", "Alice", "Bob")
-    tx2 = Transaction("payment", "Bob", "Alice", "Bob")
+    tx1 = Transaction("payment", "Bob", "Alice", "Bob", "")
+    tx2 = Transaction("payment", "Bob", "Alice", "Bob","")
     miner.add_transaction(tx1)
     miner.add_transaction(tx2)
 

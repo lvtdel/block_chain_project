@@ -4,32 +4,42 @@ package blockchain;
 
 // Transaction message (tuỳ theo cấu trúc của bạn)
 message Transaction {
-  string sender = 1;
-  string receiver = 2;
-  float amount = 3;
-  string signature = 4;
+  string tx_type = 1;
+  string payload = 2;
+  string sender = 3;
+  string receiver = 4;
+  string signature = 5;
+  int32 nonce = 6;
+  string timestamp = 7;
+  string hash = 8;
 }
 
 // Block message
 message Block {
-  int32 index = 1;
-  string previous_hash = 2;
+  int32 index = 1 ;
+  repeated Transaction transactions = 2;
   string timestamp = 3;
-  string hash = 4;
+  string previous_hash = 4;
   int32 nonce = 5;
   string merkle_root = 6;
-  repeated Transaction transactions = 7;
+  string hash = 7;
 }
 
 // Chain response
 message ChainResponse {
   repeated Block chain = 1;
+  int32 difficulty = 2;
+  repeated Transaction pending_transactions = 3;
 }
 
 // Empty request
 message Empty {}
 
-// Service
+//// Service
+//service BlockchainService {
+//  rpc GetFullChain (Empty) returns (ChainResponse);
+//}
+
 service BlockchainService {
-  rpc GetFullChain (Empty) returns (ChainResponse);
+    rpc StreamChain(Empty) returns (stream Block);
 }

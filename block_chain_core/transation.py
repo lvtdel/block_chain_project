@@ -16,6 +16,20 @@ class Transaction:
         self.timestamp = time.time()
         self.hash = self.compute_hash_msg().hex()
 
+    @staticmethod
+    def from_proto(proto_tx):
+        new_tx = Transaction(
+            tx_type=proto_tx.tx_type,
+            payload=proto_tx.payload,
+            sender=proto_tx.sender,
+            receiver=proto_tx.receiver,
+            signature=proto_tx.signature,
+            nonce=proto_tx.nonce,
+        )
+        new_tx.timestamp = proto_tx.timestamp
+        new_tx.hash = proto_tx.hash
+        return new_tx
+
     def to_dict(self):
         return {
             "tx_type": self.tx_type,
