@@ -1,17 +1,12 @@
 import asyncio
 import threading
-import time
-import hashlib
 from copy import deepcopy
 from multiprocessing import Process, Value, cpu_count
-from typing import List
 
 from block_chain_core.block import Block
 
 
 def mine_worker(start_nonce, step, block: Block, difficulty: int, result_nonce: Value, found_flag: Value):
-    # print("Miner start")
-    # time.sleep(3)
     prefix = '0' * difficulty
     nonce = start_nonce
 

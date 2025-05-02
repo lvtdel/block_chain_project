@@ -23,6 +23,14 @@ class BlockchainServicer(blockchain_pb2_grpc.BlockchainServiceServicer):
 
             yield block_grpc
 
+    def GetChainInfor(self, request, context):
+        return blockchain_pb2.ChainInfor(
+            difficulty=self.blockchain.difficulty,
+            length=len(self.blockchain.chain),
+            last_block_hash=self.blockchain.get_last_block().hash,
+            last_merkle_root=self.blockchain.get_last_block().merkle_root,
+        )
+
 
 def serve_grpc(blockchain: Blockchain, port: int = 50051):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))

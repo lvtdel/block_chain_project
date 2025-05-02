@@ -14,99 +14,119 @@ from block_chain_core.transation import Transaction
 import os
 
 from block_chain_grpc.blockchain_service import serve_grpc
-
-DIFFICULTY = int(os.getenv('DIFFICULTY'))
-PORT = int(os.getenv('PORT'))
-MAX_TRANSACTIONS = int(os.getenv('MAX_TRANSACTIONS_PER_BLOCK'))
-
-app = Flask(__name__)
-
-ee = EventEmitter()
-blockchain = Blockchain(difficulty=DIFFICULTY, ee=ee)
-miner = Miner(blockchain, MAX_TRANSACTIONS)
-
-th = threading.Thread(target=serve_grpc, args=(blockchain,))
-th.start()
-
-@ee.on('add_new_block')
-def print_new_block(block: Block):
-    # for block in blockchain.chain:
-    #     print(f"\nBlock {block.index}")
-    #     print(f"Hash: {block.hash}")
-    #     print(f"Prev: {block.previous_hash}")
-    #     print(f"Transactions: {block.transactions}")
-    print(f"New block added: {block.hash}, \nTransactions: {block.transactions}")
-    print(f"Chain valid: {blockchain.is_chain_valid()}")
+from container import Container
 
 
-@app.route('/transactions/new', methods=['POST'])
-def new_transaction():
-    data = request.get_json()
-    required_fields = ['tx_type', 'payload', 'signature', 'sender', 'nonce']
+def crate_app():
+    container = Container()
 
-    if not all(field in data for field in required_fields):
-        return jsonify({'message': 'Missing field'}), 400
+    ee = container.ee
+    blockchain = container.block_chain
+    miner = container.miner
 
-    # tx = Transaction(data['sender'], data['recipient'], data['amount'])
+    app = Flask(__name__)
 
-    tx = Transaction(**data)
+    @ee.on('add_new_block')
+    def print_new_block(block: Block):
+        # for block in blockchain.chain:
+        #     print(f"\nBlock {block.index}")
+        #     print(f"Hash: {block.hash}")
+        #     print(f"Prev: {block.previous_hash}")
+        #     print(f"Transactions: {block.transactions}")
+        print(f"New block added: {block.hash}, \nTransactions: {block.transactions}")
+        print(f"Chain valid: {blockchain.is_chain_valid()}")
 
+    @app.route('/transactions/new', methods=['POST'])
+    def new_transaction():
+        data = request.get_json()
+        required_fields = ['tx_type', 'payload', 'signature', 'sender', 'nonce']
+
+        if not all(field in data for field in required_fields):
+            return jsonify({'message': 'Missing field'}), 400
+
+        # tx = Transaction(data['sender'], data['recipient'], data['amount'])
+
+        tx = Transaction(**data)
+
+        try:
+            miner.add_transaction(tx)
+        except Exception as e:
+            return jsonify({'message': str(e)}), 400
+
+        return jsonify({'message': 'Transaction received', 'tx': tx.__dict__}), 201
+
+    @app.route('/chain', methods=['GET'])
+    def get_chain():
+        chain_data = [block.to_dict() for block in blockchain.chain]
+        chain_data.reverse()
+        return jsonify(chain_data), 200
+
+    @app.route('/pending', methods=['GET'])
+    def get_pending():
+        tx_data = [tx.__dict__ for tx in miner.mempool]
+        return jsonify(tx_data), 200
+
+    @app.route('/transactions/<tx_hash>', methods=['GET'])
+    def get_transaction_by_hash(tx_hash: str):
+        tx = blockchain.find_transaction(tx_hash)
+        if tx:
+            return jsonify(tx), 200
+        else:
+            return jsonify({'message': 'Transaction not found'}), 404
+
+    @app.route('/block/<block_hash>', methods=['GET'])
+    def get_block_by_hash(block_hash: str):
+        block = blockchain.find_block(block_hash)
+
+        if block:
+            return jsonify(block.to_dict()), 200
+        else:
+            return jsonify({'message': 'Block not found'}), 404
+
+    @app.route('/', methods=['GET'])
+    def hello():
+        return 'Hello, World!'
+
+    return app
+
+
+def run_grpc_server(blockchain: Blockchain, port: int):
+    """Hàm chạy gRPC server"""
     try:
-        miner.add_transaction(tx)
+        serve_grpc(blockchain, port)
     except Exception as e:
-        return jsonify({'message': str(e)}), 400
-
-    return jsonify({'message': 'Transaction received', 'tx': tx.__dict__}), 201
+        print(f"gRPC server error: {e}")
 
 
-# @app.route('/mine', methods=['GET'])
-# def mine_block():
-#     miner.mine_block()
-#     return jsonify({'message': 'Block mined', 'length': len(blockchain.chain)})
-
-@app.route('/chain', methods=['GET'])
-def get_chain():
-    chain_data = [block.to_dict() for block in blockchain.chain]
-    chain_data.reverse()
-    return jsonify(chain_data), 200
-
-
-@app.route('/pending', methods=['GET'])
-def get_pending():
-    tx_data = [tx.__dict__ for tx in miner.mempool]
-    return jsonify(tx_data), 200
-
-
-@app.route('/transactions/<tx_hash>', methods=['GET'])
-def get_transaction_by_hash(tx_hash: str):
-    tx = blockchain.find_transaction(tx_hash)
-    if tx:
-        return jsonify(tx), 200
-    else:
-        return jsonify({'message': 'Transaction not found'}), 404
-
-@app.route('/block/<block_hash>', methods=['GET'])
-def get_block_by_hash(block_hash: str):
-    block = blockchain.find_block(block_hash)
-
-    if block:
-        return jsonify(block.to_dict()), 200
-    else:
-        return jsonify({'message': 'Block not found'}), 404
-
-@app.route('/', methods=['GET'])
-def hello():
-    return 'Hello, World!'
+def run_http_server(app: Flask, port: int):
+    """Hàm chạy HTTP server"""
+    try:
+        serve(app, host='0.0.0.0', port=port,
+              threads=8,
+              channel_timeout=120,
+              asyncore_use_poll=True,
+              clear_untrusted_proxy_headers=True,
+              max_request_body_size=1073741824,
+              ident='Blockchain App')
+    except Exception as e:
+        print(f"HTTP server error: {e}")
 
 
 if __name__ == '__main__':
-    print("Starting server...")
-    # app.run(port=5000)
-    # serve(app, host='0.0.0.0', port=PORT,
-    #       threads=8,
-    #       channel_timeout=120,
-    #       asyncore_use_poll=True,
-    #       clear_untrusted_proxy_headers=True,
-    #       max_request_body_size=1073741824,  # 1GB
-    #       ident='Blockchain App'
-    #       )
+    HTTP_PORT = int(os.getenv('HTTP_PORT', 5000))
+    GRPC_PORT = int(os.getenv('GRPC_PORT', 50051))
+
+    print(f"Starting servers...")
+    print(f"HTTP server will run on port {HTTP_PORT}")
+    print(f"gRPC server will run on port {GRPC_PORT}")
+    app = crate_app()
+    container = Container()
+
+    grpc_thread = threading.Thread(
+        target=run_grpc_server,
+        args=(container.block_chain, GRPC_PORT),
+        daemon=True
+    )
+    grpc_thread.start()
+
+    run_http_server(app, HTTP_PORT)

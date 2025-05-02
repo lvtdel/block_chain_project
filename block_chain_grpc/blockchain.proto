@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package blockchain;
 
-// Transaction message (tuỳ theo cấu trúc của bạn)
 message Transaction {
   string tx_type = 1;
   string payload = 2;
@@ -14,7 +13,6 @@ message Transaction {
   string hash = 8;
 }
 
-// Block message
 message Block {
   int32 index = 1 ;
   repeated Transaction transactions = 2;
@@ -25,21 +23,16 @@ message Block {
   string hash = 7;
 }
 
-// Chain response
-message ChainResponse {
-  repeated Block chain = 1;
-  int32 difficulty = 2;
-  repeated Transaction pending_transactions = 3;
+message ChainInfor {
+  int32 difficulty = 1;
+  int32 length = 2;
+  string last_block_hash = 3;
+  string last_merkle_root = 4;
 }
 
-// Empty request
 message Empty {}
 
-//// Service
-//service BlockchainService {
-//  rpc GetFullChain (Empty) returns (ChainResponse);
-//}
-
 service BlockchainService {
-    rpc StreamChain(Empty) returns (stream Block);
+  rpc GetChainInfor(Empty) returns (ChainInfor);
+  rpc StreamChain(Empty) returns (stream Block);
 }

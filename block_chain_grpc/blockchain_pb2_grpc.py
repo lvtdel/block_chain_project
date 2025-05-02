@@ -26,12 +26,7 @@ if _version_not_supported:
 
 
 class BlockchainServiceStub(object):
-    """// Service
-    service BlockchainService {
-    rpc GetFullChain (Empty) returns (ChainResponse);
-    }
-
-    """
+    """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
         """Constructor.
@@ -39,6 +34,11 @@ class BlockchainServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
+        self.GetChainInfor = channel.unary_unary(
+                '/blockchain.BlockchainService/GetChainInfor',
+                request_serializer=block__chain__grpc_dot_blockchain__pb2.Empty.SerializeToString,
+                response_deserializer=block__chain__grpc_dot_blockchain__pb2.ChainInfor.FromString,
+                _registered_method=True)
         self.StreamChain = channel.unary_stream(
                 '/blockchain.BlockchainService/StreamChain',
                 request_serializer=block__chain__grpc_dot_blockchain__pb2.Empty.SerializeToString,
@@ -47,12 +47,13 @@ class BlockchainServiceStub(object):
 
 
 class BlockchainServiceServicer(object):
-    """// Service
-    service BlockchainService {
-    rpc GetFullChain (Empty) returns (ChainResponse);
-    }
+    """Missing associated documentation comment in .proto file."""
 
-    """
+    def GetChainInfor(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def StreamChain(self, request, context):
         """Missing associated documentation comment in .proto file."""
@@ -63,6 +64,11 @@ class BlockchainServiceServicer(object):
 
 def add_BlockchainServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
+            'GetChainInfor': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetChainInfor,
+                    request_deserializer=block__chain__grpc_dot_blockchain__pb2.Empty.FromString,
+                    response_serializer=block__chain__grpc_dot_blockchain__pb2.ChainInfor.SerializeToString,
+            ),
             'StreamChain': grpc.unary_stream_rpc_method_handler(
                     servicer.StreamChain,
                     request_deserializer=block__chain__grpc_dot_blockchain__pb2.Empty.FromString,
@@ -77,12 +83,34 @@ def add_BlockchainServiceServicer_to_server(servicer, server):
 
  # This class is part of an EXPERIMENTAL API.
 class BlockchainService(object):
-    """// Service
-    service BlockchainService {
-    rpc GetFullChain (Empty) returns (ChainResponse);
-    }
+    """Missing associated documentation comment in .proto file."""
 
-    """
+    @staticmethod
+    def GetChainInfor(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/blockchain.BlockchainService/GetChainInfor',
+            block__chain__grpc_dot_blockchain__pb2.Empty.SerializeToString,
+            block__chain__grpc_dot_blockchain__pb2.ChainInfor.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def StreamChain(request,
