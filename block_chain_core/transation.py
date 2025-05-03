@@ -6,7 +6,7 @@ import json
 
 
 class Transaction:
-    def __init__(self, tx_type, payload, sender, signature, nonce, receiver=None, ):
+    def __init__(self, tx_type, payload: str, sender, signature, nonce, receiver=None, ):
         self.tx_type = tx_type  # e.g. 'payment', 'document', 'vote', etc.
         self.payload = payload  # Dữ liệu cụ thể (dict, text...)
         self.sender = sender
@@ -56,9 +56,9 @@ class Transaction:
         return recovered_address.lower() == self.sender.lower()
 
     def __str__(self):
-        dct = self.__dict__
-        dct['tx_hash'] = self.compute_hash_msg().hex()
-        return dct.__str__()
+        # dct = self.__dict__
+        # dct['tx_hash'] = self.compute_hash_msg().hex()
+        return self.__dict__.__str__()
 
     def __repr__(self):
         return self.__str__()

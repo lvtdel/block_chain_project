@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package blockchain;
+import "google/protobuf/struct.proto";
 
 message Transaction {
   string tx_type = 1;
@@ -35,4 +36,5 @@ message Empty {}
 service BlockchainService {
   rpc GetChainInfor(Empty) returns (ChainInfor);
   rpc StreamChain(Empty) returns (stream Block);
+  rpc AddTransaction(Transaction) returns (Empty);
 }

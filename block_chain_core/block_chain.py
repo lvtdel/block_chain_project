@@ -1,3 +1,5 @@
+import asyncio
+import threading
 from multiprocessing import cpu_count
 
 from pyee import EventEmitter
@@ -6,18 +8,22 @@ from pyee.asyncio import AsyncIOEventEmitter
 import time
 
 from block_chain_core.block import Block
+from block_chain_core.mine import run_async_in_thread
 
 
 class Blockchain:
-    def __init__(self, difficulty=2, ee=EventEmitter):
+    def __init__(self, difficulty=2, ee=EventEmitter()):
         self.chain: list[Block] = []
         self.difficulty = difficulty
-        self.pending_transactions = []
+        # self.pending_transactions = []
         self.create_genesis_block()
         self.__ee = ee
 
         # self.ee = AsyncIOEventEmitter()
         # self.ee.on('add_transaction', self.on_add_transaction)
+    @property
+    def ee(self):
+        return self.__ee
 
     def create_genesis_block(self):
         genesis_block = Block(0, [], time.time(), "0")
@@ -30,6 +36,7 @@ class Blockchain:
 
         self.chain.append(block)
         self.__ee.emit('add_new_block', block)
+        # print("Skipped emit")
 
     def is_new_block_valid(self, block: Block):
         if not block.is_valid(self.difficulty): return False

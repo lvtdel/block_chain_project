@@ -44,6 +44,11 @@ class BlockchainServiceStub(object):
                 request_serializer=block__chain__grpc_dot_blockchain__pb2.Empty.SerializeToString,
                 response_deserializer=block__chain__grpc_dot_blockchain__pb2.Block.FromString,
                 _registered_method=True)
+        self.AddTransaction = channel.unary_unary(
+                '/blockchain.BlockchainService/AddTransaction',
+                request_serializer=block__chain__grpc_dot_blockchain__pb2.Transaction.SerializeToString,
+                response_deserializer=block__chain__grpc_dot_blockchain__pb2.Empty.FromString,
+                _registered_method=True)
 
 
 class BlockchainServiceServicer(object):
@@ -61,6 +66,12 @@ class BlockchainServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def AddTransaction(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_BlockchainServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -73,6 +84,11 @@ def add_BlockchainServiceServicer_to_server(servicer, server):
                     servicer.StreamChain,
                     request_deserializer=block__chain__grpc_dot_blockchain__pb2.Empty.FromString,
                     response_serializer=block__chain__grpc_dot_blockchain__pb2.Block.SerializeToString,
+            ),
+            'AddTransaction': grpc.unary_unary_rpc_method_handler(
+                    servicer.AddTransaction,
+                    request_deserializer=block__chain__grpc_dot_blockchain__pb2.Transaction.FromString,
+                    response_serializer=block__chain__grpc_dot_blockchain__pb2.Empty.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -129,6 +145,33 @@ class BlockchainService(object):
             '/blockchain.BlockchainService/StreamChain',
             block__chain__grpc_dot_blockchain__pb2.Empty.SerializeToString,
             block__chain__grpc_dot_blockchain__pb2.Block.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def AddTransaction(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/blockchain.BlockchainService/AddTransaction',
+            block__chain__grpc_dot_blockchain__pb2.Transaction.SerializeToString,
+            block__chain__grpc_dot_blockchain__pb2.Empty.FromString,
             options,
             channel_credentials,
             insecure,

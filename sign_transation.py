@@ -1,4 +1,5 @@
 import os
+from copy import deepcopy
 
 from eth_keys import keys
 from eth_utils import keccak
@@ -42,11 +43,15 @@ if __name__ == '__main__':
     sender_address = private_key.public_key.to_checksum_address()
     key_infor(private_key)
 
-    nonce = 1
-    tx = Transaction("payment", {"amount": 100, "currency": "USD"}, sender_address, "", nonce=nonce,
+    nonce = 2
+    tx = Transaction("payment", '{"amount": 100, "currency": "USD"}', sender_address, "", nonce=nonce,
                      receiver="0xf0faC6cc7eB427268C405A462bF304a2ac84A425")
     tx.signature = sign_transaction(tx.compute_hash_msg(), private_key.to_hex())
 
+    tx_sample = Transaction("payment", '{"amount": 100, "currency": "USD"}', sender_address,
+                            "0x42868f4a930ce991eb99ef1d1bcc97658b5539607db607d64196cb0a5bd438ba4aad85ba0c5169c59431bbf66e0d714220241f243246ba53d09e8833a1e8f33200",
+                            nonce=nonce,
+                            receiver="0xf0faC6cc7eB427268C405A462bF304a2ac84A425")
     print(tx.to_json())
     print(f"'{tx.signature}'")
     print(tx.verify())

@@ -6,6 +6,7 @@ from pyee.asyncio import AsyncIOEventEmitter
 
 from block_chain_core.block_chain import Blockchain
 from block_chain_core.miner import Miner
+from block_chain_sync.blockchain_sync import BlockChainSync
 
 
 class Container:
@@ -26,9 +27,10 @@ class Container:
         DIFFICULTY = os.getenv('DIFFICULTY', 3)
         MAX_TRANSACTIONS = os.getenv('MAX_TRANSACTIONS_PER_BLOCK', 2)
 
-        self.__ee = AsyncIOEventEmitter()
+        self.__ee = EventEmitter()
         self.__block_chain = Blockchain(difficulty=DIFFICULTY, ee=self.__ee)
         self.__miner = Miner(self.__block_chain, MAX_TRANSACTIONS)
+        self.__block_chain_sync = BlockChainSync(self.__block_chain, self.__miner, self.__ee)
 
     @property
     def block_chain(self):

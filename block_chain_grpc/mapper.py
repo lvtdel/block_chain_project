@@ -21,7 +21,7 @@ def tx_to_grpc(tx: Transaction):
         sender=tx.sender,
         receiver=tx.receiver,
         signature=tx.signature,
-        nonce=1,
+        nonce=tx.nonce,
         timestamp=str(tx.timestamp),
         hash=tx.hash
     )

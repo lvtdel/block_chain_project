@@ -22,23 +22,24 @@ _runtime_version.ValidateProtobufRuntimeVersion(
 _sym_db = _symbol_database.Default()
 
 
+from google.protobuf import struct_pb2 as google_dot_protobuf_dot_struct__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n!block_chain_grpc/blockchain.proto\x12\nblockchain\"\x94\x01\n\x0bTransaction\x12\x0f\n\x07tx_type\x18\x01 \x01(\t\x12\x0f\n\x07payload\x18\x02 \x01(\t\x12\x0e\n\x06sender\x18\x03 \x01(\t\x12\x10\n\x08receiver\x18\x04 \x01(\t\x12\x11\n\tsignature\x18\x05 \x01(\t\x12\r\n\x05nonce\x18\x06 \x01(\x05\x12\x11\n\ttimestamp\x18\x07 \x01(\t\x12\x0c\n\x04hash\x18\x08 \x01(\t\"\xa1\x01\n\x05\x42lock\x12\r\n\x05index\x18\x01 \x01(\x05\x12-\n\x0ctransactions\x18\x02 \x03(\x0b\x32\x17.blockchain.Transaction\x12\x11\n\ttimestamp\x18\x03 \x01(\t\x12\x15\n\rprevious_hash\x18\x04 \x01(\t\x12\r\n\x05nonce\x18\x05 \x01(\x05\x12\x13\n\x0bmerkle_root\x18\x06 \x01(\t\x12\x0c\n\x04hash\x18\x07 \x01(\t\"c\n\nChainInfor\x12\x12\n\ndifficulty\x18\x01 \x01(\x05\x12\x0e\n\x06length\x18\x02 \x01(\x05\x12\x17\n\x0flast_block_hash\x18\x03 \x01(\t\x12\x18\n\x10last_merkle_root\x18\x04 \x01(\t\"\x07\n\x05\x45mpty2\x86\x01\n\x11\x42lockchainService\x12:\n\rGetChainInfor\x12\x11.blockchain.Empty\x1a\x16.blockchain.ChainInfor\x12\x35\n\x0bStreamChain\x12\x11.blockchain.Empty\x1a\x11.blockchain.Block0\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n!block_chain_grpc/blockchain.proto\x12\nblockchain\x1a\x1cgoogle/protobuf/struct.proto\"\x94\x01\n\x0bTransaction\x12\x0f\n\x07tx_type\x18\x01 \x01(\t\x12\x0f\n\x07payload\x18\x02 \x01(\t\x12\x0e\n\x06sender\x18\x03 \x01(\t\x12\x10\n\x08receiver\x18\x04 \x01(\t\x12\x11\n\tsignature\x18\x05 \x01(\t\x12\r\n\x05nonce\x18\x06 \x01(\x05\x12\x11\n\ttimestamp\x18\x07 \x01(\t\x12\x0c\n\x04hash\x18\x08 \x01(\t\"\xa1\x01\n\x05\x42lock\x12\r\n\x05index\x18\x01 \x01(\x05\x12-\n\x0ctransactions\x18\x02 \x03(\x0b\x32\x17.blockchain.Transaction\x12\x11\n\ttimestamp\x18\x03 \x01(\t\x12\x15\n\rprevious_hash\x18\x04 \x01(\t\x12\r\n\x05nonce\x18\x05 \x01(\x05\x12\x13\n\x0bmerkle_root\x18\x06 \x01(\t\x12\x0c\n\x04hash\x18\x07 \x01(\t\"c\n\nChainInfor\x12\x12\n\ndifficulty\x18\x01 \x01(\x05\x12\x0e\n\x06length\x18\x02 \x01(\x05\x12\x17\n\x0flast_block_hash\x18\x03 \x01(\t\x12\x18\n\x10last_merkle_root\x18\x04 \x01(\t\"\x07\n\x05\x45mpty2\xc4\x01\n\x11\x42lockchainService\x12:\n\rGetChainInfor\x12\x11.blockchain.Empty\x1a\x16.blockchain.ChainInfor\x12\x35\n\x0bStreamChain\x12\x11.blockchain.Empty\x1a\x11.blockchain.Block0\x01\x12<\n\x0e\x41\x64\x64Transaction\x12\x17.blockchain.Transaction\x1a\x11.blockchain.Emptyb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'block_chain_grpc.blockchain_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_TRANSACTION']._serialized_start=50
-  _globals['_TRANSACTION']._serialized_end=198
-  _globals['_BLOCK']._serialized_start=201
-  _globals['_BLOCK']._serialized_end=362
-  _globals['_CHAININFOR']._serialized_start=364
-  _globals['_CHAININFOR']._serialized_end=463
-  _globals['_EMPTY']._serialized_start=465
-  _globals['_EMPTY']._serialized_end=472
-  _globals['_BLOCKCHAINSERVICE']._serialized_start=475
-  _globals['_BLOCKCHAINSERVICE']._serialized_end=609
+  _globals['_TRANSACTION']._serialized_start=80
+  _globals['_TRANSACTION']._serialized_end=228
+  _globals['_BLOCK']._serialized_start=231
+  _globals['_BLOCK']._serialized_end=392
+  _globals['_CHAININFOR']._serialized_start=394
+  _globals['_CHAININFOR']._serialized_end=493
+  _globals['_EMPTY']._serialized_start=495
+  _globals['_EMPTY']._serialized_end=502
+  _globals['_BLOCKCHAINSERVICE']._serialized_start=505
+  _globals['_BLOCKCHAINSERVICE']._serialized_end=701
 # @@protoc_insertion_point(module_scope)

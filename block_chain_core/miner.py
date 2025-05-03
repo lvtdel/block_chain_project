@@ -23,6 +23,7 @@ class Miner:
         self.max_transaction_per_block = max_transaction_per_block
 
         self.start_repeat_mine()
+        self.ee = self.blockchain.ee
 
     def start_repeat_mine(self):
         def run_async_in_thread():
@@ -44,13 +45,16 @@ class Miner:
     def add_transaction(self, transaction):
         if not transaction.verify():
             raise TransactionVerificationFailedException()
-        if not self.blockchain.is_nonce_valid(transaction.sender, transaction.nonce):
-            raise BlockchainNonceInvalidException()
         if not self.is_nonce_valid(transaction.sender, transaction.nonce):
             raise MempoolNonceInvalidException()
+        if not self.blockchain.is_nonce_valid(transaction.sender, transaction.nonce):
+            raise BlockchainNonceInvalidException()
 
         self.mempool.append(transaction)
-        self.start_mining()
+        self.ee.emit('add_new_transaction', transaction)
+
+        if len(self.mempool) >= self.max_transaction_per_block:
+            self.start_mining()
 
         return True
 

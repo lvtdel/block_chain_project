@@ -1,3 +1,4 @@
+import asyncio
 import threading
 import time
 from multiprocessing import Process
@@ -28,18 +29,22 @@ def crate_app():
 
     @ee.on('add_new_block')
     def print_new_block(block: Block):
-        # for block in blockchain.chain:
-        #     print(f"\nBlock {block.index}")
-        #     print(f"Hash: {block.hash}")
-        #     print(f"Prev: {block.previous_hash}")
-        #     print(f"Transactions: {block.transactions}")
-        print(f"New block added: {block.hash}, \nTransactions: {block.transactions}")
-        print(f"Chain valid: {blockchain.is_chain_valid()}")
+        def print_inf():
+            time.sleep(5)
+            print(f"New block added: {block.hash}, \nTransactions: {block.transactions}")
+            print(f"Chain valid: {blockchain.is_chain_valid()}")
+            # raise Exception("stop")
+
+        threading.Thread(target=print_inf, daemon=False).start()
+
+        # raise Exception("stop")
 
     @app.route('/transactions/new', methods=['POST'])
     def new_transaction():
         data = request.get_json()
         required_fields = ['tx_type', 'payload', 'signature', 'sender', 'nonce']
+        data.pop('timestamp')
+        data.pop('hash')
 
         if not all(field in data for field in required_fields):
             return jsonify({'message': 'Missing field'}), 400
@@ -90,16 +95,14 @@ def crate_app():
     return app
 
 
-def run_grpc_server(blockchain: Blockchain, port: int):
-    """Hàm chạy gRPC server"""
+def run_grpc_server(port: int):
     try:
-        serve_grpc(blockchain, port)
+        serve_grpc(port)
     except Exception as e:
         print(f"gRPC server error: {e}")
 
 
 def run_http_server(app: Flask, port: int):
-    """Hàm chạy HTTP server"""
     try:
         serve(app, host='0.0.0.0', port=port,
               threads=8,
@@ -124,7 +127,7 @@ if __name__ == '__main__':
 
     grpc_thread = threading.Thread(
         target=run_grpc_server,
-        args=(container.block_chain, GRPC_PORT),
+        args=(GRPC_PORT,),
         daemon=True
     )
     grpc_thread.start()
