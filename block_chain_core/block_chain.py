@@ -35,11 +35,12 @@ class Blockchain:
         with self._lock:
             if validate:
                 if not self.is_new_block_valid(block):
-                    print("Invalid block, block discarded.")
+                    print(f"Invalid block, block discarded: Block hash {block.hash}")
                     return
 
             self.chain.append(block)
-            if should_emit: self.__ee.emit('add_new_block', block)
+            self.__ee.emit('add_new_block', block)
+            if should_emit: self.__ee.emit('sync:add_new_block', block)
 
     def is_new_block_valid(self, block: Block):
         if not block.is_valid(self.difficulty): return False

@@ -4,8 +4,11 @@ from block_chain_grpc import blockchain_pb2
 
 
 def block_to_grpc(block: Block):
+    tx_grpc_list = [tx_to_grpc(tx) for tx in block.transactions]
+
     return blockchain_pb2.Block(
         index=block.index,
+        transactions=tx_grpc_list,
         previous_hash=block.previous_hash,
         timestamp=str(block.timestamp),
         hash=block.hash,

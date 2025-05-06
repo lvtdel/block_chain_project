@@ -1,6 +1,7 @@
 import os
 import threading
 
+from flask.cli import load_dotenv
 from pyee import EventEmitter
 from pyee.asyncio import AsyncIOEventEmitter
 
@@ -24,10 +25,13 @@ class Container:
             return
         self._initialized = True
 
-        DIFFICULTY = os.getenv('DIFFICULTY', 3)
-        MAX_TRANSACTIONS = os.getenv('MAX_TRANSACTIONS_PER_BLOCK', 2)
+        load_dotenv()
+        DIFFICULTY = int(os.getenv('DIFFICULTY', 3))
+        MAX_TRANSACTIONS = int(os.getenv('MAX_TRANSACTIONS_PER_BLOCK', 2))
         MY_ADD = os.getenv("MY_ADD")
         REGISTER_ADD = os.getenv("REGISTER_ADD")
+
+        print(f"DIFFICULTY: {DIFFICULTY}")
 
         self.__ee = EventEmitter()
         self.__block_chain = Blockchain(difficulty=DIFFICULTY, ee=self.__ee)

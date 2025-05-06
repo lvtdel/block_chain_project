@@ -65,3 +65,11 @@ class Transaction:
 
     def to_json(self):
         return json.dumps(self.__dict__, indent=4)
+
+    def __eq__(self, other):
+        if not isinstance(other, Transaction):
+            return False
+        return self.hash == other.hash
+
+    def __hash__(self):
+        return hash(self.hash)

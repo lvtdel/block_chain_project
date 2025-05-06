@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package blockchain;
-import "google/protobuf/struct.proto";
+//import "google/protobuf/struct.proto";
 
 message Transaction {
   string tx_type = 1;
@@ -39,6 +39,10 @@ message NodeAddressList {
   repeated NodeAddress ips = 1;
 }
 
+message Mempool {
+  repeated Transaction transactions = 1;
+}
+
 message Empty {}
 
 service BlockchainService {
@@ -47,4 +51,5 @@ service BlockchainService {
   rpc AddTransaction(Transaction) returns (Empty);
   rpc AddBlock(Block) returns (Empty);
   rpc AddNode(NodeAddress) returns (NodeAddressList);
+  rpc GetMempool(Empty) returns (Mempool);
 }

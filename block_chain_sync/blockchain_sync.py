@@ -1,4 +1,5 @@
 import threading
+import time
 from abc import ABC
 
 import grpc
@@ -20,7 +21,7 @@ T = TypeVar('T')  # Định nghĩa generic type
 
 
 class BlockChainSyncAbstract(ABC):
-    def __init__(self,my_add: str):
+    def __init__(self, my_add: str):
         self.my_add = my_add
         self.nodes: set[str] = {my_add}
 
@@ -55,10 +56,20 @@ class BlockChainSync(BlockChainSyncAbstract):
         self.ee = ee
 
         self.register_listener()
+        self.start_repeat_sync()
+
+    def start_repeat_sync(self):
+        def run_async_in_thread():
+            while True:
+                # print("Repeat mine")
+                self.sync()
+                time.sleep(5)
+
+        threading.Thread(target=run_async_in_thread, daemon=False).start()
 
     def register_listener(self):
-        self.ee.on('add_new_transaction', self.broadcast_transaction)
-        self.ee.on('add_new_block', self.broadcast_block)
+        self.ee.on('sync:add_new_transaction', self.broadcast_transaction)
+        self.ee.on('sync:add_new_block', self.broadcast_block)
 
     def register_node(self, node_address_register: str):
         try:
@@ -84,8 +95,36 @@ class BlockChainSync(BlockChainSyncAbstract):
         self.nodes.remove(node)
 
     def sync(self):
-        for node in self.nodes:
-            self.sync_with_node(node)
+        node_longest = self.get_node_longest_chain()
+        if not node_longest: return
+
+        if node_longest['length'] > len(self.blockchain.chain):
+            print(f"Node longest chain is longer than local chain. Syncing with node {node_longest['node']}")
+            self.sync_with_node(node_longest)
+        # else:
+        #     print("Local chain is longer than node longest chain. Do nothing.")
+
+        # chain_longest = self.get_chain_from_node(node_longest)
+
+    def sync_with_node(self, node_infor):
+        try:
+            chain_longest = self.get_chain_from_node(node_infor)
+            self.miner.must_stop_mine = True
+            self.blockchain.chain = chain_longest.chain
+
+            with grpc.insecure_channel(node_infor['node']) as channel:
+                stub = blockchain_pb2_grpc.BlockchainServiceStub(channel)
+                mempool_grpc = stub.GetMempool(blockchain_pb2.Empty())
+                mempool = [Transaction.from_proto(tx_grpc) for tx_grpc in mempool_grpc.transactions]
+
+                self.miner.mempool = mempool
+                self.miner.must_stop_mine = False
+
+            self.miner.must_stop_sync = False
+        except grpc.RpcError as e:
+            print(f"Đồng bộ thất bại: {e}")
+        except Exception as e:
+            print(f"Lỗi khi đồng bộ: {e}")
 
     def broadcast_transaction(self, transaction: Transaction):
         def send_transaction_to_node(node: str):
@@ -100,7 +139,7 @@ class BlockChainSync(BlockChainSyncAbstract):
                 print(f"Lỗi khi gửi transaction tới node {node}: {e}")
 
         thread_list: list[threading.Thread] = []
-        add_to_send = self.nodes.difference({self.my_add})
+        add_to_send = self.get_different_node()
         for node in add_to_send:
             thread = threading.Thread(target=send_transaction_to_node, args=(node,))
             thread.start()
@@ -119,14 +158,11 @@ class BlockChainSync(BlockChainSyncAbstract):
                 print(f"Lỗi khi gửi block tới node {node}: {e}")
 
         thread_list: list[threading.Thread] = []
-        add_to_send = self.nodes.difference({self.my_add})
+        add_to_send = self.get_different_node()
         for node in add_to_send:
             thread = threading.Thread(target=send_block_to_node, args=(node,))
             thread.start()
             thread_list.append(thread)
-
-    def sync_with_node(self, node: str):
-        pass
 
     def get_node_longest_chain(self):
         infor_nodes = []
@@ -143,7 +179,9 @@ class BlockChainSync(BlockChainSyncAbstract):
                 print(f"Failed to get chain info from node {node}")
 
         thread_list: list[threading.Thread] = []
-        for node in self.nodes:
+
+        node_diff = self.get_different_node()
+        for node in node_diff:
             thr = threading.Thread(target=add_infor_node, args=(node,))
             thr.start()
             thread_list.append(thr)
@@ -151,9 +189,13 @@ class BlockChainSync(BlockChainSyncAbstract):
         for thread in thread_list:
             thread.join()
 
+        if not infor_nodes:
+            print("Chưa có node nào khác trong mạng")
+            return None
+
         chain_longest = max(infor_nodes, key=lambda x: x["length"])
 
-        print(f"longest chain: {chain_longest}")
+        # print(f"longest chain: {chain_longest}")
         return chain_longest
 
     def get_chain_info(self, node: str):
@@ -193,3 +235,6 @@ class BlockChainSync(BlockChainSyncAbstract):
                 return None
 
         return block_chain
+
+    def get_different_node(self):
+        return self.nodes.difference({self.my_add})

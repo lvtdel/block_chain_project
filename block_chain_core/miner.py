@@ -22,6 +22,7 @@ class Miner:
         self.mining_thread = None
         self.max_transaction_per_block = max_transaction_per_block
         self.must_stop_mine = False
+        self.__lock = threading.Lock()
 
         self.start_repeat_mine()
         self.ee = self.blockchain.ee
@@ -43,24 +44,27 @@ class Miner:
 
         self.start_mining()
 
-    def add_transaction(self, transaction):
-        if not transaction.verify():
-            raise TransactionVerificationFailedException()
-        if not self.is_nonce_valid(transaction.sender, transaction.nonce):
-            raise MempoolNonceInvalidException()
-        if not self.blockchain.is_nonce_valid(transaction.sender, transaction.nonce):
-            raise BlockchainNonceInvalidException()
+    def add_transaction(self, transaction, should_emit=True):
+        with self.__lock:
+            if not transaction.verify():
+                raise TransactionVerificationFailedException()
+            if not self.is_nonce_valid(transaction.sender, transaction.nonce):
+                raise MempoolNonceInvalidException()
+            if not self.blockchain.is_nonce_valid(transaction.sender, transaction.nonce):
+                raise BlockchainNonceInvalidException()
 
-        self.mempool.append(transaction)
-        self.ee.emit('add_new_transaction', transaction)
+            self.mempool.append(transaction)
+            self.ee.emit('add_new_transaction', transaction)
+            if should_emit:
+                self.ee.emit('sync:add_new_transaction', transaction)
 
-        if len(self.mempool) >= self.max_transaction_per_block:
-            self.start_mining()
+            if len(self.mempool) >= self.max_transaction_per_block:
+                self.start_mining()
 
-        return True
+            return True
 
     def start_mining(self):
-        if self.__is_mining:
+        if self.__is_mining or self.must_stop_mine:
             # print("Already mining...")
             return
 
@@ -113,3 +117,9 @@ class Miner:
                 return False
 
         return True
+
+    def clear_tx_list(self, tx_list: list[Transaction]):
+        for tx in tx_list:
+            if tx in self.mempool:
+                self.mempool.remove(tx)
+                print(f"Removed tx from mempool: {tx.hash}")

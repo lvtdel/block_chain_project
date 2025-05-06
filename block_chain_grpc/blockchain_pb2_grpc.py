@@ -59,6 +59,11 @@ class BlockchainServiceStub(object):
                 request_serializer=block__chain__grpc_dot_blockchain__pb2.NodeAddress.SerializeToString,
                 response_deserializer=block__chain__grpc_dot_blockchain__pb2.NodeAddressList.FromString,
                 _registered_method=True)
+        self.GetMempool = channel.unary_unary(
+                '/blockchain.BlockchainService/GetMempool',
+                request_serializer=block__chain__grpc_dot_blockchain__pb2.Empty.SerializeToString,
+                response_deserializer=block__chain__grpc_dot_blockchain__pb2.Mempool.FromString,
+                _registered_method=True)
 
 
 class BlockchainServiceServicer(object):
@@ -94,6 +99,12 @@ class BlockchainServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetMempool(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_BlockchainServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -121,6 +132,11 @@ def add_BlockchainServiceServicer_to_server(servicer, server):
                     servicer.AddNode,
                     request_deserializer=block__chain__grpc_dot_blockchain__pb2.NodeAddress.FromString,
                     response_serializer=block__chain__grpc_dot_blockchain__pb2.NodeAddressList.SerializeToString,
+            ),
+            'GetMempool': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetMempool,
+                    request_deserializer=block__chain__grpc_dot_blockchain__pb2.Empty.FromString,
+                    response_serializer=block__chain__grpc_dot_blockchain__pb2.Mempool.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -258,6 +274,33 @@ class BlockchainService(object):
             '/blockchain.BlockchainService/AddNode',
             block__chain__grpc_dot_blockchain__pb2.NodeAddress.SerializeToString,
             block__chain__grpc_dot_blockchain__pb2.NodeAddressList.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetMempool(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/blockchain.BlockchainService/GetMempool',
+            block__chain__grpc_dot_blockchain__pb2.Empty.SerializeToString,
+            block__chain__grpc_dot_blockchain__pb2.Mempool.FromString,
             options,
             channel_credentials,
             insecure,

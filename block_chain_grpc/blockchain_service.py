@@ -22,9 +22,9 @@ class BlockchainServicer(blockchain_pb2_grpc.BlockchainServiceServicer):
         for block in self.blockchain.chain:
             block_grpc = block_to_grpc(block)
 
-            for tx in block.transactions:
-                tx_grpc = tx_to_grpc(tx)
-                block_grpc.transactions.append(tx_grpc)
+            # for tx in block.transactions:
+            #     tx_grpc = tx_to_grpc(tx)
+            #     block_grpc.transactions.append(tx_grpc)
 
             yield block_grpc
 
@@ -36,10 +36,13 @@ class BlockchainServicer(blockchain_pb2_grpc.BlockchainServiceServicer):
             last_merkle_root=self.blockchain.get_last_block().merkle_root,
         )
 
+    def GetMempool(self, request, context):
+        return blockchain_pb2.Mempool(transactions=[tx_to_grpc(tx) for tx in self.miner.mempool])
+
     def AddTransaction(self, request, context):
         try:
             tx = Transaction.from_proto(request)
-            self.miner.add_transaction(tx)
+            self.miner.add_transaction(tx, should_emit=False)
         except Exception as e:
             print(f"Failed to process transaction: {str(e)}")
             context.abort(grpc.StatusCode.INVALID_ARGUMENT, f"Failed to process transaction: {str(e)}")
@@ -47,9 +50,12 @@ class BlockchainServicer(blockchain_pb2_grpc.BlockchainServiceServicer):
         return blockchain_pb2.Empty()
 
     def AddBlock(self, request, context):
+        print(f"Received block: Block hash: {request.hash}")
         try:
             block = Block.from_proto(request)
-            self.blockchain.add_block(block)
+            self.blockchain.add_block(block, should_emit=False)
+            # self.blockchain_sync.broadcast_block(block)
+            self.miner.clear_tx_list(block.transactions)
         except Exception as e:
             print(f"Failed to process block: {str(e)}")
             context.abort(grpc.StatusCode.INVALID_ARGUMENT, f"Failed to process block: {str(e)}")
