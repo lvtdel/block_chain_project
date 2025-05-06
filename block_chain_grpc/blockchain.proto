@@ -31,10 +31,20 @@ message ChainInfor {
   string last_merkle_root = 4;
 }
 
+message NodeAddress {
+  string ip = 1;
+}
+
+message NodeAddressList {
+  repeated NodeAddress ips = 1;
+}
+
 message Empty {}
 
 service BlockchainService {
   rpc GetChainInfor(Empty) returns (ChainInfor);
   rpc StreamChain(Empty) returns (stream Block);
   rpc AddTransaction(Transaction) returns (Empty);
+  rpc AddBlock(Block) returns (Empty);
+  rpc AddNode(NodeAddress) returns (NodeAddressList);
 }

@@ -49,6 +49,16 @@ class BlockchainServiceStub(object):
                 request_serializer=block__chain__grpc_dot_blockchain__pb2.Transaction.SerializeToString,
                 response_deserializer=block__chain__grpc_dot_blockchain__pb2.Empty.FromString,
                 _registered_method=True)
+        self.AddBlock = channel.unary_unary(
+                '/blockchain.BlockchainService/AddBlock',
+                request_serializer=block__chain__grpc_dot_blockchain__pb2.Block.SerializeToString,
+                response_deserializer=block__chain__grpc_dot_blockchain__pb2.Empty.FromString,
+                _registered_method=True)
+        self.AddNode = channel.unary_unary(
+                '/blockchain.BlockchainService/AddNode',
+                request_serializer=block__chain__grpc_dot_blockchain__pb2.NodeAddress.SerializeToString,
+                response_deserializer=block__chain__grpc_dot_blockchain__pb2.NodeAddressList.FromString,
+                _registered_method=True)
 
 
 class BlockchainServiceServicer(object):
@@ -72,6 +82,18 @@ class BlockchainServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def AddBlock(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def AddNode(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_BlockchainServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -89,6 +111,16 @@ def add_BlockchainServiceServicer_to_server(servicer, server):
                     servicer.AddTransaction,
                     request_deserializer=block__chain__grpc_dot_blockchain__pb2.Transaction.FromString,
                     response_serializer=block__chain__grpc_dot_blockchain__pb2.Empty.SerializeToString,
+            ),
+            'AddBlock': grpc.unary_unary_rpc_method_handler(
+                    servicer.AddBlock,
+                    request_deserializer=block__chain__grpc_dot_blockchain__pb2.Block.FromString,
+                    response_serializer=block__chain__grpc_dot_blockchain__pb2.Empty.SerializeToString,
+            ),
+            'AddNode': grpc.unary_unary_rpc_method_handler(
+                    servicer.AddNode,
+                    request_deserializer=block__chain__grpc_dot_blockchain__pb2.NodeAddress.FromString,
+                    response_serializer=block__chain__grpc_dot_blockchain__pb2.NodeAddressList.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -172,6 +204,60 @@ class BlockchainService(object):
             '/blockchain.BlockchainService/AddTransaction',
             block__chain__grpc_dot_blockchain__pb2.Transaction.SerializeToString,
             block__chain__grpc_dot_blockchain__pb2.Empty.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def AddBlock(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/blockchain.BlockchainService/AddBlock',
+            block__chain__grpc_dot_blockchain__pb2.Block.SerializeToString,
+            block__chain__grpc_dot_blockchain__pb2.Empty.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def AddNode(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/blockchain.BlockchainService/AddNode',
+            block__chain__grpc_dot_blockchain__pb2.NodeAddress.SerializeToString,
+            block__chain__grpc_dot_blockchain__pb2.NodeAddressList.FromString,
             options,
             channel_credentials,
             insecure,

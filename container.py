@@ -26,11 +26,17 @@ class Container:
 
         DIFFICULTY = os.getenv('DIFFICULTY', 3)
         MAX_TRANSACTIONS = os.getenv('MAX_TRANSACTIONS_PER_BLOCK', 2)
+        MY_ADD = os.getenv("MY_ADD")
+        REGISTER_ADD = os.getenv("REGISTER_ADD")
 
         self.__ee = EventEmitter()
         self.__block_chain = Blockchain(difficulty=DIFFICULTY, ee=self.__ee)
         self.__miner = Miner(self.__block_chain, MAX_TRANSACTIONS)
-        self.__block_chain_sync = BlockChainSync(self.__block_chain, self.__miner, self.__ee)
+
+        self.__block_chain_sync = BlockChainSync(self.__block_chain, self.__miner, MY_ADD, self.__ee)
+        if REGISTER_ADD:
+            self.__block_chain_sync.register_node(REGISTER_ADD)
+            self.__block_chain_sync.add_node(REGISTER_ADD)
 
     @property
     def block_chain(self):
@@ -43,3 +49,7 @@ class Container:
     @property
     def ee(self):
         return self.__ee
+
+    @property
+    def block_chain_sync(self):
+        return self.__block_chain_sync

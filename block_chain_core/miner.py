@@ -21,6 +21,7 @@ class Miner:
         self.__is_mining = False
         self.mining_thread = None
         self.max_transaction_per_block = max_transaction_per_block
+        self.must_stop_mine = False
 
         self.start_repeat_mine()
         self.ee = self.blockchain.ee

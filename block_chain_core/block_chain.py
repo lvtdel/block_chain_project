@@ -18,25 +18,28 @@ class Blockchain:
         # self.pending_transactions = []
         self.create_genesis_block()
         self.__ee = ee
+        self._lock = threading.Lock()
 
         # self.ee = AsyncIOEventEmitter()
         # self.ee.on('add_transaction', self.on_add_transaction)
+
     @property
     def ee(self):
         return self.__ee
 
     def create_genesis_block(self):
-        genesis_block = Block(0, [], time.time(), "0")
+        genesis_block = Block(0, [], 0, "0")
         self.chain.append(genesis_block)
 
-    def add_block(self, block: Block, validate=True):
-        if validate:
-            if not self.is_new_block_valid(block):
-                print("Invalid block, block discarded.")
+    def add_block(self, block: Block, validate=True, should_emit=True):
+        with self._lock:
+            if validate:
+                if not self.is_new_block_valid(block):
+                    print("Invalid block, block discarded.")
+                    return
 
-        self.chain.append(block)
-        self.__ee.emit('add_new_block', block)
-        # print("Skipped emit")
+            self.chain.append(block)
+            if should_emit: self.__ee.emit('add_new_block', block)
 
     def is_new_block_valid(self, block: Block):
         if not block.is_valid(self.difficulty): return False

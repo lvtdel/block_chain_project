@@ -14,12 +14,19 @@ from typing import Any, Callable, TypeVar
 
 from block_chain_core.transation import Transaction
 from block_chain_grpc import blockchain_pb2_grpc, blockchain_pb2
-from block_chain_grpc.mapper import tx_to_grpc
+from block_chain_grpc.mapper import tx_to_grpc, block_to_grpc
 
 T = TypeVar('T')  # Định nghĩa generic type
 
 
 class BlockChainSyncAbstract(ABC):
+    def __init__(self,my_add: str):
+        self.my_add = my_add
+        self.nodes: set[str] = {my_add}
+
+    def register_node(self, node: str):
+        pass
+
     def add_node(self, node: str):
         pass
 
@@ -40,22 +47,38 @@ class BlockChainSyncAbstract(ABC):
 
 
 class BlockChainSync(BlockChainSyncAbstract):
-    def __init__(self, blockchain: Blockchain, miner: Miner, ee=EventEmitter()):
+    def __init__(self, blockchain: Blockchain, miner: Miner, my_add: str, ee=EventEmitter()):
+        super().__init__(my_add)
+
         self.blockchain = blockchain
         self.miner = miner
         self.ee = ee
 
-        self.nodes: list[str] = ["localhost:5001", "localhost:6001", "localhost:5002", "localhost:5003",
-                                 "localhost:5004", ]
-
-        self.ee.on('add_new_block', self.broadcast_block)
-        self.ee.on('add_new_transaction', self.broadcast_transaction)
+        self.register_listener()
 
     def register_listener(self):
         self.ee.on('add_new_transaction', self.broadcast_transaction)
+        self.ee.on('add_new_block', self.broadcast_block)
+
+    def register_node(self, node_address_register: str):
+        try:
+            with grpc.insecure_channel(node_address_register) as channel:
+                stub = blockchain_pb2_grpc.BlockchainServiceStub(channel)
+                node_add_proto = blockchain_pb2.NodeAddress()
+                node_add_proto.ip = self.my_add
+
+                response = stub.AddNode(node_add_proto)
+                node_add_list = [node.ip for node in response.ips]
+
+                self.nodes.update(node_add_list)
+        except grpc.RpcError as e:
+            print(f"Không thể đăng ký node {node_address_register}: {e}")
+        except Exception as e:
+            print(f"Lỗi khi đăng ký node {node_address_register}: {e}")
 
     def add_node(self, node: str):
-        self.nodes.append(node)
+        self.nodes.add(node)
+        print(f"Node set: {self.nodes}")
 
     def remove_node(self, node: str):
         self.nodes.remove(node)
@@ -77,14 +100,30 @@ class BlockChainSync(BlockChainSyncAbstract):
                 print(f"Lỗi khi gửi transaction tới node {node}: {e}")
 
         thread_list: list[threading.Thread] = []
-        for node in self.nodes:
+        add_to_send = self.nodes.difference({self.my_add})
+        for node in add_to_send:
             thread = threading.Thread(target=send_transaction_to_node, args=(node,))
             thread.start()
             thread_list.append(thread)
 
-        # Đợi tất cả các thread hoàn thành
-        # for thread in thread_list:
-        #     thread.join()
+    def broadcast_block(self, block: Block):
+        def send_block_to_node(node: str):
+            try:
+                with grpc.insecure_channel(node) as chanel:
+                    stub = blockchain_pb2_grpc.BlockchainServiceStub(chanel)
+                    block_proto = block_to_grpc(block)
+                    stub.AddBlock(block_proto)
+            except grpc.RpcError as e:
+                print(f"Không thể gửi block tới node {node}: {e}")
+            except Exception as e:
+                print(f"Lỗi khi gửi block tới node {node}: {e}")
+
+        thread_list: list[threading.Thread] = []
+        add_to_send = self.nodes.difference({self.my_add})
+        for node in add_to_send:
+            thread = threading.Thread(target=send_block_to_node, args=(node,))
+            thread.start()
+            thread_list.append(thread)
 
     def sync_with_node(self, node: str):
         pass

@@ -8,13 +8,15 @@ from block_chain_core.miner import Miner
 from block_chain_core.transation import Transaction
 from block_chain_grpc import blockchain_pb2_grpc, blockchain_pb2
 from block_chain_grpc.mapper import block_to_grpc, tx_to_grpc
+from block_chain_sync.blockchain_sync import BlockChainSyncAbstract
 from container import Container
 
 
 class BlockchainServicer(blockchain_pb2_grpc.BlockchainServiceServicer):
-    def __init__(self, blockchain: Blockchain, miner: Miner):
+    def __init__(self, blockchain: Blockchain, miner: Miner, blockchain_sync: BlockChainSyncAbstract):
         self.blockchain = blockchain
         self.miner = miner
+        self.blockchain_sync = blockchain_sync
 
     def StreamChain(self, request, context):
         for block in self.blockchain.chain:
@@ -35,23 +37,52 @@ class BlockchainServicer(blockchain_pb2_grpc.BlockchainServiceServicer):
         )
 
     def AddTransaction(self, request, context):
-        tx = Transaction.from_proto(request)
         try:
             tx = Transaction.from_proto(request)
             self.miner.add_transaction(tx)
         except Exception as e:
+            print(f"Failed to process transaction: {str(e)}")
             context.abort(grpc.StatusCode.INVALID_ARGUMENT, f"Failed to process transaction: {str(e)}")
 
         return blockchain_pb2.Empty()
+
+    def AddBlock(self, request, context):
+        try:
+            block = Block.from_proto(request)
+            self.blockchain.add_block(block)
+        except Exception as e:
+            print(f"Failed to process block: {str(e)}")
+            context.abort(grpc.StatusCode.INVALID_ARGUMENT, f"Failed to process block: {str(e)}")
+
+        return blockchain_pb2.Empty()
+
+    def AddNode(self, request, context):
+        try:
+            self.blockchain_sync.add_node(request.ip)
+
+            response = blockchain_pb2.NodeAddressList()
+
+            for node_ip in self.blockchain_sync.nodes:
+                node = response.ips.add()
+                node.ip = node_ip
+
+            return response
+        except Exception as e:
+            print(f"Failed to add node: {str(e)}")
+            context.abort(grpc.StatusCode.INVALID_ARGUMENT, f"Failed to add node: {str(e)}")
+            return None
 
 
 def serve_grpc(port: int = 50051):
     container = Container()
     blockchain = container.block_chain
     miner = container.miner
+    blockchain_sync = container.block_chain_sync
+
+    blockchain_service = BlockchainServicer(blockchain, miner, blockchain_sync)
 
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    blockchain_pb2_grpc.add_BlockchainServiceServicer_to_server(BlockchainServicer(blockchain, miner), server)
+    blockchain_pb2_grpc.add_BlockchainServiceServicer_to_server(blockchain_service, server)
     server.add_insecure_port(f'[::]:{port}')
     server.start()
     print(f"Blockchain node gRPC server started at port {port}.")
