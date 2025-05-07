@@ -76,10 +76,10 @@ class BlockChainSync(BlockChainSyncAbstract):
             with grpc.insecure_channel(node_address_register) as channel:
                 stub = blockchain_pb2_grpc.BlockchainServiceStub(channel)
                 node_add_proto = blockchain_pb2.NodeAddress()
-                node_add_proto.ip = self.my_add
+                node_add_proto.add = self.my_add
 
-                response = stub.AddNode(node_add_proto)
-                node_add_list = [node.ip for node in response.ips]
+                response = stub.add_node(node_add_proto)
+                node_add_list = [node.add for node in response.adds]
 
                 self.nodes.update(node_add_list)
         except grpc.RpcError as e:
@@ -114,7 +114,7 @@ class BlockChainSync(BlockChainSyncAbstract):
 
             with grpc.insecure_channel(node_infor['node']) as channel:
                 stub = blockchain_pb2_grpc.BlockchainServiceStub(channel)
-                mempool_grpc = stub.GetMempool(blockchain_pb2.Empty())
+                mempool_grpc = stub.get_mempool(blockchain_pb2.Empty())
                 mempool = [Transaction.from_proto(tx_grpc) for tx_grpc in mempool_grpc.transactions]
 
                 self.miner.mempool = mempool
@@ -132,7 +132,7 @@ class BlockChainSync(BlockChainSyncAbstract):
                 with grpc.insecure_channel(node) as channel:
                     stub = blockchain_pb2_grpc.BlockchainServiceStub(channel)
                     transaction_proto = tx_to_grpc(transaction)
-                    stub.AddTransaction(transaction_proto)
+                    stub.add_transaction(transaction_proto)
             except grpc.RpcError as e:
                 print(f"Không thể gửi transaction tới node {node}: {e}")
             except Exception as e:
@@ -151,7 +151,7 @@ class BlockChainSync(BlockChainSyncAbstract):
                 with grpc.insecure_channel(node) as chanel:
                     stub = blockchain_pb2_grpc.BlockchainServiceStub(chanel)
                     block_proto = block_to_grpc(block)
-                    stub.AddBlock(block_proto)
+                    stub.add_block(block_proto)
             except grpc.RpcError as e:
                 print(f"Không thể gửi block tới node {node}: {e}")
             except Exception as e:
@@ -190,7 +190,7 @@ class BlockChainSync(BlockChainSyncAbstract):
             thread.join()
 
         if not infor_nodes:
-            print("Chưa có node nào khác trong mạng")
+            # print("Chưa có node nào khác trong mạng")
             return None
 
         chain_longest = max(infor_nodes, key=lambda x: x["length"])
@@ -202,7 +202,7 @@ class BlockChainSync(BlockChainSyncAbstract):
         try:
             with grpc.insecure_channel(node) as channel:
                 stub = blockchain_pb2_grpc.BlockchainServiceStub(channel)
-                block_chain_infor = stub.GetChainInfor(blockchain_pb2.Empty())
+                block_chain_infor = stub.get_chain_infor(blockchain_pb2.Empty())
                 return block_chain_infor
         except grpc.RpcError as e:
             print(f"An RPC error occurred: {e}")
@@ -221,7 +221,7 @@ class BlockChainSync(BlockChainSyncAbstract):
             block_chain.chain.clear()
 
             try:
-                response = stub.StreamChain(blockchain_pb2.Empty())
+                response = stub.stream_chain(blockchain_pb2.Empty())
                 for block_grpc in response:
                     block = Block.from_proto(block_grpc)
                     # print(block)

@@ -32,11 +32,11 @@ message ChainInfor {
 }
 
 message NodeAddress {
-  string ip = 1;
+  string add = 1;
 }
 
 message NodeAddressList {
-  repeated NodeAddress ips = 1;
+  repeated NodeAddress adds = 1;
 }
 
 message Mempool {
@@ -46,10 +46,10 @@ message Mempool {
 message Empty {}
 
 service BlockchainService {
-  rpc GetChainInfor(Empty) returns (ChainInfor);
-  rpc StreamChain(Empty) returns (stream Block);
-  rpc AddTransaction(Transaction) returns (Empty);
-  rpc AddBlock(Block) returns (Empty);
-  rpc AddNode(NodeAddress) returns (NodeAddressList);
-  rpc GetMempool(Empty) returns (Mempool);
+  rpc get_chain_infor(Empty) returns (ChainInfor);
+  rpc stream_chain(Empty) returns (stream Block);
+  rpc add_transaction(Transaction) returns (Empty);
+  rpc add_block(Block) returns (Empty);
+  rpc add_node(NodeAddress) returns (NodeAddressList);
+  rpc get_mempool(Empty) returns (Mempool);
 }

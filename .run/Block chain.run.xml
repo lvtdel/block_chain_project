@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Block chain" type="CompoundRunConfigurationType">
+    <toRun name="app 5000 5001" type="PythonConfigurationType" />
+    <toRun name="app 6000 6001" type="PythonConfigurationType" />
+    <method v="2" />
+  </configuration>
+</component>

@@ -16,6 +16,7 @@ import os
 
 from block_chain_grpc.blockchain_service import serve_grpc
 from container import Container
+from exception.transaction_nonce_validation_exceptions import VerificationException
 
 
 def crate_app():
@@ -30,7 +31,7 @@ def crate_app():
     @ee.on('add_new_block')
     def print_new_block(block: Block):
         def print_inf():
-            time.sleep(5)
+            # time.sleep(5)
             print(f"New block added: {block.hash}, \nTransactions: {block.transactions}")
             print(f"Chain valid: {blockchain.is_chain_valid()}")
             # raise Exception("stop")
@@ -55,8 +56,10 @@ def crate_app():
 
         try:
             miner.add_transaction(tx)
-        except Exception as e:
+        except VerificationException as e:
             return jsonify({'message': str(e)}), 400
+        except Exception as e:
+            return jsonify({'message debug': str(e)}), 500
 
         return jsonify({'message': 'Transaction received', 'tx': tx.__dict__}), 201
 
