@@ -34,33 +34,33 @@ class BlockchainServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.GetChainInfor = channel.unary_unary(
-                '/blockchain.BlockchainService/GetChainInfor',
+        self.get_chain_infor = channel.unary_unary(
+                '/blockchain.BlockchainService/get_chain_infor',
                 request_serializer=block__chain__grpc_dot_blockchain__pb2.Empty.SerializeToString,
                 response_deserializer=block__chain__grpc_dot_blockchain__pb2.ChainInfor.FromString,
                 _registered_method=True)
-        self.StreamChain = channel.unary_stream(
-                '/blockchain.BlockchainService/StreamChain',
+        self.stream_chain = channel.unary_stream(
+                '/blockchain.BlockchainService/stream_chain',
                 request_serializer=block__chain__grpc_dot_blockchain__pb2.Empty.SerializeToString,
                 response_deserializer=block__chain__grpc_dot_blockchain__pb2.Block.FromString,
                 _registered_method=True)
-        self.AddTransaction = channel.unary_unary(
-                '/blockchain.BlockchainService/AddTransaction',
+        self.add_transaction = channel.unary_unary(
+                '/blockchain.BlockchainService/add_transaction',
                 request_serializer=block__chain__grpc_dot_blockchain__pb2.Transaction.SerializeToString,
                 response_deserializer=block__chain__grpc_dot_blockchain__pb2.Empty.FromString,
                 _registered_method=True)
-        self.AddBlock = channel.unary_unary(
-                '/blockchain.BlockchainService/AddBlock',
+        self.add_block = channel.unary_unary(
+                '/blockchain.BlockchainService/add_block',
                 request_serializer=block__chain__grpc_dot_blockchain__pb2.Block.SerializeToString,
                 response_deserializer=block__chain__grpc_dot_blockchain__pb2.Empty.FromString,
                 _registered_method=True)
-        self.AddNode = channel.unary_unary(
-                '/blockchain.BlockchainService/AddNode',
+        self.add_node = channel.unary_unary(
+                '/blockchain.BlockchainService/add_node',
                 request_serializer=block__chain__grpc_dot_blockchain__pb2.NodeAddress.SerializeToString,
                 response_deserializer=block__chain__grpc_dot_blockchain__pb2.NodeAddressList.FromString,
                 _registered_method=True)
-        self.GetMempool = channel.unary_unary(
-                '/blockchain.BlockchainService/GetMempool',
+        self.get_mempool = channel.unary_unary(
+                '/blockchain.BlockchainService/get_mempool',
                 request_serializer=block__chain__grpc_dot_blockchain__pb2.Empty.SerializeToString,
                 response_deserializer=block__chain__grpc_dot_blockchain__pb2.Mempool.FromString,
                 _registered_method=True)
@@ -69,37 +69,37 @@ class BlockchainServiceStub(object):
 class BlockchainServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def GetChainInfor(self, request, context):
+    def get_chain_infor(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def StreamChain(self, request, context):
+    def stream_chain(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def AddTransaction(self, request, context):
+    def add_transaction(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def AddBlock(self, request, context):
+    def add_block(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def AddNode(self, request, context):
+    def add_node(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetMempool(self, request, context):
+    def get_mempool(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -108,33 +108,33 @@ class BlockchainServiceServicer(object):
 
 def add_BlockchainServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'GetChainInfor': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetChainInfor,
+            'get_chain_infor': grpc.unary_unary_rpc_method_handler(
+                    servicer.get_chain_infor,
                     request_deserializer=block__chain__grpc_dot_blockchain__pb2.Empty.FromString,
                     response_serializer=block__chain__grpc_dot_blockchain__pb2.ChainInfor.SerializeToString,
             ),
-            'StreamChain': grpc.unary_stream_rpc_method_handler(
-                    servicer.StreamChain,
+            'stream_chain': grpc.unary_stream_rpc_method_handler(
+                    servicer.stream_chain,
                     request_deserializer=block__chain__grpc_dot_blockchain__pb2.Empty.FromString,
                     response_serializer=block__chain__grpc_dot_blockchain__pb2.Block.SerializeToString,
             ),
-            'AddTransaction': grpc.unary_unary_rpc_method_handler(
-                    servicer.AddTransaction,
+            'add_transaction': grpc.unary_unary_rpc_method_handler(
+                    servicer.add_transaction,
                     request_deserializer=block__chain__grpc_dot_blockchain__pb2.Transaction.FromString,
                     response_serializer=block__chain__grpc_dot_blockchain__pb2.Empty.SerializeToString,
             ),
-            'AddBlock': grpc.unary_unary_rpc_method_handler(
-                    servicer.AddBlock,
+            'add_block': grpc.unary_unary_rpc_method_handler(
+                    servicer.add_block,
                     request_deserializer=block__chain__grpc_dot_blockchain__pb2.Block.FromString,
                     response_serializer=block__chain__grpc_dot_blockchain__pb2.Empty.SerializeToString,
             ),
-            'AddNode': grpc.unary_unary_rpc_method_handler(
-                    servicer.AddNode,
+            'add_node': grpc.unary_unary_rpc_method_handler(
+                    servicer.add_node,
                     request_deserializer=block__chain__grpc_dot_blockchain__pb2.NodeAddress.FromString,
                     response_serializer=block__chain__grpc_dot_blockchain__pb2.NodeAddressList.SerializeToString,
             ),
-            'GetMempool': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetMempool,
+            'get_mempool': grpc.unary_unary_rpc_method_handler(
+                    servicer.get_mempool,
                     request_deserializer=block__chain__grpc_dot_blockchain__pb2.Empty.FromString,
                     response_serializer=block__chain__grpc_dot_blockchain__pb2.Mempool.SerializeToString,
             ),
@@ -150,7 +150,7 @@ class BlockchainService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def GetChainInfor(request,
+    def get_chain_infor(request,
             target,
             options=(),
             channel_credentials=None,
@@ -163,7 +163,7 @@ class BlockchainService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/blockchain.BlockchainService/GetChainInfor',
+            '/blockchain.BlockchainService/get_chain_infor',
             block__chain__grpc_dot_blockchain__pb2.Empty.SerializeToString,
             block__chain__grpc_dot_blockchain__pb2.ChainInfor.FromString,
             options,
@@ -177,7 +177,7 @@ class BlockchainService(object):
             _registered_method=True)
 
     @staticmethod
-    def StreamChain(request,
+    def stream_chain(request,
             target,
             options=(),
             channel_credentials=None,
@@ -190,7 +190,7 @@ class BlockchainService(object):
         return grpc.experimental.unary_stream(
             request,
             target,
-            '/blockchain.BlockchainService/StreamChain',
+            '/blockchain.BlockchainService/stream_chain',
             block__chain__grpc_dot_blockchain__pb2.Empty.SerializeToString,
             block__chain__grpc_dot_blockchain__pb2.Block.FromString,
             options,
@@ -204,7 +204,7 @@ class BlockchainService(object):
             _registered_method=True)
 
     @staticmethod
-    def AddTransaction(request,
+    def add_transaction(request,
             target,
             options=(),
             channel_credentials=None,
@@ -217,7 +217,7 @@ class BlockchainService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/blockchain.BlockchainService/AddTransaction',
+            '/blockchain.BlockchainService/add_transaction',
             block__chain__grpc_dot_blockchain__pb2.Transaction.SerializeToString,
             block__chain__grpc_dot_blockchain__pb2.Empty.FromString,
             options,
@@ -231,7 +231,7 @@ class BlockchainService(object):
             _registered_method=True)
 
     @staticmethod
-    def AddBlock(request,
+    def add_block(request,
             target,
             options=(),
             channel_credentials=None,
@@ -244,7 +244,7 @@ class BlockchainService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/blockchain.BlockchainService/AddBlock',
+            '/blockchain.BlockchainService/add_block',
             block__chain__grpc_dot_blockchain__pb2.Block.SerializeToString,
             block__chain__grpc_dot_blockchain__pb2.Empty.FromString,
             options,
@@ -258,7 +258,7 @@ class BlockchainService(object):
             _registered_method=True)
 
     @staticmethod
-    def AddNode(request,
+    def add_node(request,
             target,
             options=(),
             channel_credentials=None,
@@ -271,7 +271,7 @@ class BlockchainService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/blockchain.BlockchainService/AddNode',
+            '/blockchain.BlockchainService/add_node',
             block__chain__grpc_dot_blockchain__pb2.NodeAddress.SerializeToString,
             block__chain__grpc_dot_blockchain__pb2.NodeAddressList.FromString,
             options,
@@ -285,7 +285,7 @@ class BlockchainService(object):
             _registered_method=True)
 
     @staticmethod
-    def GetMempool(request,
+    def get_mempool(request,
             target,
             options=(),
             channel_credentials=None,
@@ -298,7 +298,7 @@ class BlockchainService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/blockchain.BlockchainService/GetMempool',
+            '/blockchain.BlockchainService/get_mempool',
             block__chain__grpc_dot_blockchain__pb2.Empty.SerializeToString,
             block__chain__grpc_dot_blockchain__pb2.Mempool.FromString,
             options,

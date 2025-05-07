@@ -18,7 +18,7 @@ class BlockchainServicer(blockchain_pb2_grpc.BlockchainServiceServicer):
         self.miner = miner
         self.blockchain_sync = blockchain_sync
 
-    def StreamChain(self, request, context):
+    def stream_chain(self, request, context):
         for block in self.blockchain.chain:
             block_grpc = block_to_grpc(block)
 
@@ -28,7 +28,7 @@ class BlockchainServicer(blockchain_pb2_grpc.BlockchainServiceServicer):
 
             yield block_grpc
 
-    def GetChainInfor(self, request, context):
+    def get_chain_infor(self, request, context):
         return blockchain_pb2.ChainInfor(
             difficulty=self.blockchain.difficulty,
             length=len(self.blockchain.chain),
@@ -36,10 +36,10 @@ class BlockchainServicer(blockchain_pb2_grpc.BlockchainServiceServicer):
             last_merkle_root=self.blockchain.get_last_block().merkle_root,
         )
 
-    def GetMempool(self, request, context):
+    def get_mempool(self, request, context):
         return blockchain_pb2.Mempool(transactions=[tx_to_grpc(tx) for tx in self.miner.mempool])
 
-    def AddTransaction(self, request, context):
+    def add_transaction(self, request, context):
         try:
             tx = Transaction.from_proto(request)
             self.miner.add_transaction(tx, should_emit=False)
@@ -49,7 +49,7 @@ class BlockchainServicer(blockchain_pb2_grpc.BlockchainServiceServicer):
 
         return blockchain_pb2.Empty()
 
-    def AddBlock(self, request, context):
+    def add_block(self, request, context):
         print(f"Received block: Block hash: {request.hash}")
         try:
             block = Block.from_proto(request)
@@ -62,15 +62,15 @@ class BlockchainServicer(blockchain_pb2_grpc.BlockchainServiceServicer):
 
         return blockchain_pb2.Empty()
 
-    def AddNode(self, request, context):
+    def add_node(self, request, context):
         try:
-            self.blockchain_sync.add_node(request.ip)
+            self.blockchain_sync.add_node(request.add)
 
             response = blockchain_pb2.NodeAddressList()
 
             for node_ip in self.blockchain_sync.nodes:
-                node = response.ips.add()
-                node.ip = node_ip
+                node = response.adds.add()
+                node.add = node_ip
 
             return response
         except Exception as e:

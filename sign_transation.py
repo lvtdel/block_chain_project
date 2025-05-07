@@ -1,4 +1,5 @@
 import os
+import secrets
 from copy import deepcopy
 
 from eth_keys import keys
@@ -6,6 +7,14 @@ from eth_utils import keccak
 import json
 
 from block_chain_core.transation import Transaction
+
+
+def generate_eth_key_pair():
+    # Tạo private key ngẫu nhiên 32 bytes
+    private_key_bytes = secrets.token_bytes(32)
+    private_key = keys.PrivateKey(private_key_bytes)
+
+    return private_key
 
 
 def read_private_key_from_file(file_path: str) -> keys.PrivateKey:
@@ -39,19 +48,28 @@ def key_infor(private_key: keys.PrivateKey):
 
 
 if __name__ == '__main__':
+    # private_key_generate = generate_eth_key_pair()
+    # print("Key generated:")
+    # key_infor(private_key_generate)
+    # print("---------")
+
+
     private_key = read_private_key_from_file(os.path.join(os.getcwd(), "private_key_1"))
-    sender_address = private_key.public_key.to_checksum_address()
+    print("Key read from file:")
     key_infor(private_key)
 
+    sender_address = private_key.public_key.to_checksum_address()
+
+    ## Tạo transaction và ký
     nonce = 2
     tx = Transaction("payment", '{"amount": 100, "currency": "USD"}', sender_address, "", nonce=nonce,
                      receiver="0xf0faC6cc7eB427268C405A462bF304a2ac84A425")
     tx.signature = sign_transaction(tx.compute_hash_msg(), private_key.to_hex())
 
-    tx_sample = Transaction("payment", '{"amount": 100, "currency": "USD"}', sender_address,
-                            "0x42868f4a930ce991eb99ef1d1bcc97658b5539607db607d64196cb0a5bd438ba4aad85ba0c5169c59431bbf66e0d714220241f243246ba53d09e8833a1e8f33200",
-                            nonce=nonce,
-                            receiver="0xf0faC6cc7eB427268C405A462bF304a2ac84A425")
+    # tx_sample = Transaction("payment", '{"amount": 100, "currency": "USD"}', sender_address,
+    #                         "0x42868f4a930ce991eb99ef1d1bcc97658b5539607db607d64196cb0a5bd438ba4aad85ba0c5169c59431bbf66e0d714220241f243246ba53d09e8833a1e8f33200",
+    #                         nonce=nonce,
+    #                         receiver="0xf0faC6cc7eB427268C405A462bF304a2ac84A425")
     print(tx.to_json())
-    print(f"'{tx.signature}'")
+    # print(f"'{tx.signature}'")
     print(tx.verify())
