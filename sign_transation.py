@@ -61,8 +61,11 @@ if __name__ == '__main__':
     sender_address = private_key.public_key.to_checksum_address()
 
     ## Tạo transaction và ký
-    nonce = 2
-    tx = Transaction("payment", '{"amount": 100, "currency": "USD"}', sender_address, "", nonce=nonce,
+    nonce = 1
+    payload = '{"amount": 100, "currency": "USD"}'
+    # payload = 'Trong bối cảnh công nghệ hiện đại phát triển vượt bậc, việc ứng dụng các giải pháp công nghệ vào quản lý và giảng dạy trong môi trường giáo dục là một xu hướng tất yếu. Đề tài "Hệ thống điểm danh bằng điện thoại sinh viên tích hợp nhận diện khuôn mặt" được thực hiện nhằm mục đích nâng cao hiệu quả và tính chính xác trong quá trình điểm danh, đồng thời tạo điều kiện thuận lợi cho cả giảng viên và sinh viên.'
+    type = "payment"
+    tx = Transaction(type, payload, sender_address, "", nonce=nonce,
                      receiver="0xf0faC6cc7eB427268C405A462bF304a2ac84A425")
     tx.signature = sign_transaction(tx.compute_hash_msg(), private_key.to_hex())
 

@@ -3,7 +3,8 @@ import threading
 import time
 from multiprocessing import Process
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
+
 from pyee import EventEmitter
 from waitress import serve
 
@@ -39,6 +40,10 @@ def crate_app():
         threading.Thread(target=print_inf, daemon=False).start()
 
         # raise Exception("stop")
+
+    @app.route('/')
+    def index():
+        return render_template('index.html')
 
     @app.route('/transactions/new', methods=['POST'])
     def new_transaction():
@@ -82,6 +87,12 @@ def crate_app():
         else:
             return jsonify({'message': 'Transaction not found'}), 404
 
+    @app.route('/transactions', methods=['GET'])
+    def get_all_transactions():
+        transactions = blockchain.get_all_transactions()
+        transactions.reverse()  # Hiển thị giao dịch mới nhất trước
+        return jsonify(transactions), 200
+
     @app.route('/block/<block_hash>', methods=['GET'])
     def get_block_by_hash(block_hash: str):
         block = blockchain.find_block(block_hash)
@@ -90,6 +101,26 @@ def crate_app():
             return jsonify(block.to_dict()), 200
         else:
             return jsonify({'message': 'Block not found'}), 404
+
+    @app.route('/balance/<address>', methods=['GET'])
+    def get_address_balance_api(address: str):
+        try:
+            # Kiểm tra địa chỉ có hợp lệ không
+            if not address or len(address) < 2:
+                return jsonify({
+                    'error': 'Invalid address format'
+                }), 400
+
+            # Sử dụng hàm get_address_balance từ blockchain
+            balance_info = blockchain.get_address_balance(address)
+
+            return jsonify(balance_info), 200
+
+        except Exception as e:
+            return jsonify({
+                'error': 'Internal server error',
+                'message': str(e)
+            }), 500
 
     @app.route('/', methods=['GET'])
     def hello():

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Explorer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Blockchain Explorer</h1>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active", id="blockchain" onclick="showTab('blockchain')">Blockchain</button>
+            <button class="nav-tab" id="transactions" onclick="showTab('transactions')">Tất cả giao dịch</button>
+            <button class="nav-tab"id="pending" onclick="showTab('pending')">Giao dịch đang chờ</button>
+        </div>
+
+        <div class="content-card">
+            <!-- Transaction Details View -->
+            <div id="transaction-view">
+                <div class="tx-header">
+                    <div>
+                        <div class="tx-hash">TX HASH</div>
+                        <div class="tx-hash-value">0xb3dd251ba0b052b8ea616886d376b8a108a63e2386a10f1296ccad90e1ea91ba</div>
+                    </div>
+                    <div class="tx-type-badge">VALUE TRANSFER</div>
+                </div>
+
+                <div class="transaction-details">
+                    <div class="detail-section">
+                        <div class="detail-label">FROM ADDRESS</div>
+                        <div class="detail-value address-value">0x43a3dE1E97DBEFCbaFEAE566B2ec089F262eDhD0D</div>
+                    </div>
+
+                    <div class="detail-section">
+                        <div class="detail-label">TO ADDRESS</div>
+                        <div class="detail-value address-value">0xAb717F30d3c394DA288D4B96FcE46ad63Eecb7a</div>
+                    </div>
+
+                    <div class="detail-section">
+                        <div class="detail-label">VALUE</div>
+                        <div class="detail-value value-amount">500000000000000000000</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blockchain View -->
+            <div id="blockchain-view" style="display: none;">
+                <h2 style="margin-bottom: 20px; color: #2d3748;">Các khối gần đây</h2>
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Đang tải dữ liệu blockchain...
+                </div>
+            </div>
+
+            <!-- All Transactions View -->
+            <div id="transactions-view" style="display: none;">
+                <h2 style="margin-bottom: 20px; color: #2d3748;">Tất cả giao dịch</h2>
+                <div class="transactions-list">
+                    <!-- Transaction Card 1 -->
+                    <div class="transaction-card">
+                        <div class="tx-card-header">
+                            <div class="tx-hash-section">
+                                <div class="tx-hash-label">TX HASH</div>
+                                <div class="tx-hash-value">0xb3dd251ba0b052b8ea616886d376b8a108a63e2386a10f1296ccad90e1ea91ba</div>
+                            </div>
+                            <div class="tx-type-badge">VALUE TRANSFER</div>
+                        </div>
+                        <div class="tx-card-content">
+                            <div class="tx-info-row">
+                                <div class="tx-info-item">
+                                    <div class="tx-info-label">FROM ADDRESS</div>
+                                    <div class="tx-info-value">0x43a3dE1E97DBEFCbaFEAE566B2ec089F262eDhD0D</div>
+                                </div>
+                                <div class="tx-info-item">
+                                    <div class="tx-info-label">TO ADDRESS</div>
+                                    <div class="tx-info-value">0xAb717F30d3c394DA288D4B96FcE46ad63Eecb7a</div>
+                                </div>
+                                <div class="tx-info-item">
+                                    <div class="tx-info-label">VALUE</div>
+                                    <div class="tx-info-value tx-value">500000000000000000000</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transaction Card 2 -->
+                    <div class="transaction-card">
+                        <div class="tx-card-header">
+                            <div class="tx-hash-section">
+                                <div class="tx-hash-label">TX HASH</div>
+                                <div class="tx-hash-value">0xe28154cc3b33b7e71237130f11987fcae8bc07f0ab60d620ffe4f088220d3f3f</div>
+                            </div>
+                            <div class="tx-type-badge">VALUE TRANSFER</div>
+                        </div>
+                        <div class="tx-card-content">
+                            <div class="tx-info-row">
+                                <div class="tx-info-item">
+                                    <div class="tx-info-label">FROM ADDRESS</div>
+                                    <div class="tx-info-value">0x69ADfDd0b1c83224CCe400E6ECCF453FF1ae9C</div>
+                                </div>
+                                <div class="tx-info-item">
+                                    <div class="tx-info-label">TO ADDRESS</div>
+                                    <div class="tx-info-value">0x8735667CaC7552739DF55f7F3eC200E4459eA8dA</div>
+                                </div>
+                                <div class="tx-info-item">
+                                    <div class="tx-info-label">VALUE</div>
+                                    <div class="tx-info-value tx-value">300000000000000000000</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Transactions View -->
+            <div id="pending-view" style="display: none;">
+                <h2 style="margin-bottom: 20px; color: #2d3748;">Giao dịch đang chờ</h2>
+                <div class="no-data">Không có giao dịch đang chờ</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+
+</html>

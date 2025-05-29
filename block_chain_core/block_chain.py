@@ -1,4 +1,5 @@
 import asyncio
+import json
 import threading
 from multiprocessing import cpu_count
 
@@ -9,6 +10,7 @@ import time
 
 from block_chain_core.block import Block
 from block_chain_core.mine import run_async_in_thread
+from block_chain_core.transation import Transaction
 
 
 class Blockchain:
@@ -28,7 +30,8 @@ class Blockchain:
         return self.__ee
 
     def create_genesis_block(self):
-        genesis_block = Block(0, [], 0, "0")
+        first_tx = Transaction("payment", "{\"amount\": 100, \"currency\": \"USD\"}", "0", "0", "", "0xd206080A25862e79C74B804273936A0e843DAa03")
+        genesis_block = Block(0, [first_tx], 0, "0")
         self.chain.append(genesis_block)
 
     def add_block(self, block: Block, validate=True, should_emit=True):
@@ -93,3 +96,66 @@ class Blockchain:
                     return False
 
         return True
+
+    def get_all_transactions(self):
+        transactions = []
+        for block in self.chain:
+            for tx in block.transactions:
+                tx_dict = tx.__dict__.copy()
+                tx_dict['block_hash'] = block.hash
+                tx_dict['block_index'] = block.index
+                tx_dict['block_timestamp'] = block.timestamp
+                transactions.append(tx_dict)
+        return transactions
+
+    def get_address_balance(self, address: str) -> dict:
+        """
+        Kiểm tra số dư của một địa chỉ trong blockchain
+
+        Args:
+            address (str): Địa chỉ cần kiểm tra số dư
+
+        Returns:
+            dict: Dictionary chứa thông tin số dư theo từng loại tiền tệ
+        """
+        balances = {}  # Dict lưu số dư theo từng loại tiền
+
+        # Duyệt qua tất cả các block trong blockchain
+        for block in self.chain:
+            for tx in block.transactions:
+                # Kiểm tra giao dịch có phải loại payment không
+                if tx.tx_type.lower() != 'payment':
+                    continue
+
+                try:
+                    # Parse payload để lấy thông tin amount và currency
+                    payload = json.loads(tx.payload)
+                    amount = float(payload.get('amount', 0))
+                    currency = payload.get('currency', '').upper()
+
+                    # Nếu currency chưa có trong balances thì khởi tạo
+                    if currency not in balances:
+                        balances[currency] = 0
+
+                    # Nếu địa chỉ là người nhận, cộng số tiền
+                    if tx.receiver == address:
+                        balances[currency] += amount
+
+                    # Nếu địa chỉ là người gửi, trừ số tiền
+                    if tx.sender == address:
+                        balances[currency] -= amount
+
+                except (json.JSONDecodeError, KeyError, ValueError):
+                    # Bỏ qua nếu payload không hợp lệ
+                    continue
+
+        return {
+            'address': address,
+            'balances': balances,
+            'total_transactions': sum(
+                1 for block in self.chain
+                for tx in block.transactions
+                if tx.sender == address or tx.receiver == address
+            ),
+            'last_updated': int(time.time())  # Thời gian cập nhật cuối
+        }

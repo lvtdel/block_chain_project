@@ -1,7 +1,9 @@
 import asyncio
+import json
 import threading
 from concurrent.futures import ThreadPoolExecutor
 import time
+from locale import currency
 from multiprocessing import cpu_count
 
 from block_chain_core.block import Block
@@ -52,6 +54,23 @@ class Miner:
                 raise MempoolNonceInvalidException()
             if not self.blockchain.is_nonce_valid(transaction.sender, transaction.nonce):
                 raise BlockchainNonceInvalidException()
+
+
+            if transaction.tx_type.lower() == 'payment':
+                data_payment = json.loads(transaction.payload)
+                currency_payment = data_payment['currency']
+                amount_payment = data_payment['amount']
+                if amount_payment <= 0:
+                    raise Exception(f"Amount must be greater than 0")
+
+                balance = self.blockchain.get_address_balance(transaction.sender)['balances']
+
+                if currency_payment not in balance:
+                    raise Exception(f"Sender {transaction.sender} doesn't have balance of {currency_payment}")
+
+                if balance[currency_payment] < amount_payment:
+                    raise Exception(f"Sender {transaction.sender} doesn't have enough balance to send {amount_payment} {currency_payment} to {transaction.receiver}")
+
 
             self.mempool.append(transaction)
             self.ee.emit('add_new_transaction', transaction)
